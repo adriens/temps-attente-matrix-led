@@ -53,7 +53,9 @@ au plus tard une semaine avant la soutenance. Faute de quoi deux options :**
 
 Ci-dessous l'elevator pitch : 
 
-> Ce projet tutoré a pour but de ....
+> Un projet de dataviz sur Matrice LED drivée par les données de temps d'attente de l'OPT-NC
+> afin de livrer de manière simple, efficace et artitique un device indiquant le niveau
+> d'attente d'une agence.
 
 ## 🤝 DoD (_Definition of Done_)
 
