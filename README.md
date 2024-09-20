@@ -4,6 +4,13 @@ Chaque année, l'[Université de Nouvelle-Calédonie](https://unc.nc/) challenge
 sur des projets tutorés afin de leur donner une première expérience de développement 
 sur des problématiques en lien avec le monde de l'entreprise.
 
+# 🧑‍🤝‍🧑 Teams
+
+- **👨‍🦲 LEAD Dev** : [Raphael Bordais](https://www.linkedin.com/in/rapha%C3%ABl-bordais/)
+- **👨 Dev** : Jose Goue
+- **👱‍♀️ Senior Dev** : [Michèle Barré](https://github.com/mbarre/)
+- 👨 PO : [Adrien](https://dev.to/adriens)
+
 # 🍿 Video introductive
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/yOAKC5cTDc8/0.jpg)](https://www.youtube.com/watch?v=yOAKC5cTDc8)
