@@ -11,6 +11,19 @@ sur des problématiques en lien avec le monde de l'entreprise.
 - **👱‍♀️ Senior Dev** : [Michèle Barré](https://github.com/mbarre/)
 - 👨 PO : [Adrien](https://dev.to/adriens)
 
+# 📑 Documentations de la matrix
+
+- 🎥 La video qui m'a fait acheter cette matrice : [First look at Cosmic Unicorn (32 x 32 RGB LED matrix with Raspberry Pi Pico W Aboard)](https://www.youtube.com/watch?v=q1DxovtleYA)
+- [Pico W Smart LED Matrix – Cosmic Unicorn (32x32 – 1024 pixels)](https://shop.pimoroni.com/products/space-unicorns?variant=40842626596947)
+- [Pimoroni Pico Libraries and Examples](https://github.com/pimoroni/pimoroni-pico)
+- https://github.com/pimoroni/pimoroni-pico
+- https://github.com/pimoroni
+- [`micropython/examples/cosmic_unicorn`](https://github.com/pimoroni/pimoroni-pico/tree/main/micropython/examples/cosmic_unicorn)
+- [micropython/examples/stellar_unicorn](https://github.com/pimoroni/pimoroni-pico/tree/main/micropython/examples/stellar_unicorn)
+- [micropython/modules/picographics](https://github.com/pimoroni/pimoroni-pico/tree/main/micropython/modules/picographics)
+- [🎥 PIMoroni Cosmic Unicorn Review & Setup: 32x32 RGB LEDs Powered By Pi Pico W ](https://www.youtube.com/watch?v=zDMYQI06_9w)
+- 
+
 # 🍿 Video introductive
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/yOAKC5cTDc8/0.jpg)](https://www.youtube.com/watch?v=yOAKC5cTDc8)
