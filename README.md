@@ -22,7 +22,14 @@ sur des problématiques en lien avec le monde de l'entreprise.
 - [micropython/examples/stellar_unicorn](https://github.com/pimoroni/pimoroni-pico/tree/main/micropython/examples/stellar_unicorn)
 - [micropython/modules/picographics](https://github.com/pimoroni/pimoroni-pico/tree/main/micropython/modules/picographics)
 - [🎥 PIMoroni Cosmic Unicorn Review & Setup: 32x32 RGB LEDs Powered By Pi Pico W ](https://www.youtube.com/watch?v=zDMYQI06_9w)
-- 
+
+# 🧰 Outils
+
+- [`ty-porter/RGBMatrixEmulator`](https://github.com/ty-porter/RGBMatrixEmulator) : _"A desktop interface to emulate Raspberry Pi-powered LED matrices driven by rpi-rgb-led-matrix"_
+
+# 💡 Idées pour inspiration
+
+- [`MLB-LED-Scoreboard/mlb-led-scoreboard`](https://github.com/MLB-LED-Scoreboard/mlb-led-scoreboard) : _"An LED scoreboard for Major League Baseball ⚾ "_
 
 # 🍿 Video introductive
 
