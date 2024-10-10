@@ -25,7 +25,7 @@ COLORS = {
 # Classe pour gérer l'affichage sur l'écran Cosmic Unicorn
 class CosmicUnicornDisplay:
     def __init__(self):
-        """Initialise l'affichage, les stylos, et le statut du son."""
+        """Initialise l'affichage, les stylos, le statut du son, la luminosité et le volume."""
         self.cu = CosmicUnicorn()
         self.graphics = PicoGraphics(display=DISPLAY_COSMIC_UNICORN)
         self.width, self.height = self.graphics.get_bounds()
@@ -35,16 +35,27 @@ class CosmicUnicornDisplay:
         self.transition_var = ''
         self.graphics.set_font("bitmap4")
         self.sound_enabled = True  # Statut du son activé/désactivé
+        self.brightness = 0.5  # Luminosité initiale
+        self.loop_paused = False  # Variable de pause pour le bouton B
+        self.volume = 500  # Fréquence initiale du bip
+        self.pause_led_position = (1, 25)  # Position de la LED de pause
         self.led_positions_on = [(2, 9), (1, 10), (2, 10), (1, 11), (2, 11), (2, 12)]  # LED quand son activé
         self.led_positions_off_red = [(0, 9), (1, 10), (2, 11), (3, 12)]  # LED rouges quand son désactivé
         self.led_positions_off_blue = [(2, 9), (1, 10), (2, 10), (1, 11), (2, 11), (2, 12)]  # LED bleues quand son désactivé
         self.channel = self.cu.synth_channel(5)  # Canal synth pour le bip sonore
+        self.cu.set_brightness(self.brightness)
+        self.update_led_sound_status(self.sound_enabled)  # Initialiser les LEDs du son
         print("Affichage initialisé avec succès")
 
     def clear(self):
-        """Efface l'écran."""
+        """Efface l'écran sans toucher aux LEDs du son et de pause."""
         self.graphics.set_pen(self.pens['BLACK'])
         self.graphics.clear()
+        # Ne pas effacer les LEDs du son et de pause
+        self.update_led_sound_status(self.sound_enabled)
+        if self.loop_paused:
+            self.set_pen('YELLOW')
+            self.graphics.pixel(*self.pause_led_position)
         self.update()
 
     def update(self):
@@ -56,10 +67,9 @@ class CosmicUnicornDisplay:
         self.graphics.set_pen(self.pens[color])
 
     def scroll_text(self, message):
-        """Gère le défilement du texte."""
+        """Gère le défilement du texte sur l'écran."""
         PADDING = 5
         STEP_TIME = 0.1
-        
         msg_width = self.graphics.measure_text(message, 1)
         time_ms = time.ticks_ms()
 
@@ -87,7 +97,7 @@ class CosmicUnicornDisplay:
         self.update()
 
     def draw_text_opt(self):
-        """Affiche le texte OPT NC sur la partie gauche."""
+        """Affiche le texte OPT NC sur la partie gauche de l'écran."""
         self.set_pen('BLUE')
         o_coords = [(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (2, 1), (2, 5), (3, 1), (3, 5), (4, 1), (4, 2), (4, 3), (4, 4), (4, 5)]
         p_coords = [(6, 1), (6, 2), (6, 3), (6, 4), (6, 5), (7, 1), (7, 3), (8, 1), (8, 2), (8, 3)]
@@ -98,7 +108,11 @@ class CosmicUnicornDisplay:
         self.update()
 
     def draw_smiley(self, mood):
-        """Dessine un smiley en fonction de l'humeur (happy, neutral, sad)."""
+        """Dessine un smiley en fonction de l'humeur (happy, neutral, sad) sans effacer les LEDs du son."""
+        # Effacement seulement de la zone du smiley
+        self.set_pen('BLACK')
+        self.graphics.rectangle(7, 7, 19, 19)  # Smiley area, sans toucher aux LEDs du son
+
         smiley_coords = [
             (13, 8), (14, 8), (15, 8), (16, 8), (17, 8), (18, 8),
             (11, 9), (12, 9), (13, 9), (18, 9), (19, 9), (20, 9),
@@ -128,16 +142,19 @@ class CosmicUnicornDisplay:
             'neutral': [(13, 20), (14, 20), (15, 20), (16, 20), (17, 20), (18, 20)],
             'sad': [(13, 19), (14, 19), (15, 19), (16, 19), (17, 19), (18, 19), (12, 20), (13, 20), (14, 20), (15, 20), (16, 20), (17, 20), (18, 20), (19, 20)]
         }
+
         time_coords = {
-            'happy':   [(30, 8), (29, 8), (29, 9), (29, 10), (30, 10), (30, 11), (30, 12), (29, 12), (27, 9), (26, 10), (27, 11)],  # LED pour <5
+            'happy': [(30, 8), (29, 8), (29, 9), (29, 10), (30, 10), (30, 11), (30, 12), (29, 12), (27, 9), (26, 10), (27, 11)],  # LED pour <5
             'neutral': [(27, 8), (27, 9), (27, 10), (27, 11), (27, 12), (29, 8), (29, 9), (29, 10), (29, 11), (29, 12), (30, 8), (30, 12), (31, 8), (31, 9), (31, 10), (31, 11), (31, 12), (25, 9), (24, 10), (25, 11)],  # LED pour <10
-            'sad':     [(27, 8), (27, 9), (27, 10), (27, 11), (27, 12), (29, 8), (29, 9), (29, 10), (29, 11), (29, 12), (30, 8), (30, 12), (31, 8), (31, 9), (31, 10), (31, 11), (31, 12), (24, 9), (25, 10), (24, 11)],  # LED pour >10
+            'sad': [(27, 8), (27, 9), (27, 10), (27, 11), (27, 12), (29, 8), (29, 9), (29, 10), (29, 11), (29, 12), (30, 8), (30, 12), (31, 8), (31, 9), (31, 10), (31, 11), (31, 12), (24, 9), (25, 10), (24, 11)],  # LED pour >10
         }
+
         mood_color = {
             'happy': 'GREEN_SMILEY',
             'neutral': 'YELLOW_SMILEY',
             'sad': 'RED_SMILEY'
         }
+
         self.set_pen(mood_color[mood])
         for x, y in smiley_coords:
             self.graphics.pixel(x, y)
@@ -147,13 +164,6 @@ class CosmicUnicornDisplay:
             self.graphics.pixel(x, y)
         for x, y in time_coords[mood]:
             self.graphics.pixel(x, y)
-
-        # Son associé aux humeurs neutre et triste
-        if mood == 'neutral':
-            self.play_bip(500)  # Un bip pour l'humeur neutre
-        elif mood == 'sad':
-            for _ in range(3):  # Trois bips pour l'humeur triste
-                self.play_bip(400)
 
         self.update()
 
@@ -167,6 +177,31 @@ class CosmicUnicornDisplay:
                 self.channel.trigger_release()  # Arrêter la tonalité
         except Exception as e:
             print(f"Erreur lors de la lecture du bip : {e}")
+
+    def adjust_brightness(self):
+        """Ajuste la luminosité en fonction des boutons de luminosité."""
+        if self.cu.is_pressed(CosmicUnicorn.SWITCH_BRIGHTNESS_UP):
+            if self.brightness < 1.0:
+                self.brightness += 0.01
+            print("Bouton ajustement luminosité pressé - augmentation de la luminosité")
+        elif self.cu.is_pressed(CosmicUnicorn.SWITCH_BRIGHTNESS_DOWN):
+            if self.brightness > 0.0:
+                self.brightness -= 0.01
+            print("Bouton ajustement luminosité pressé - réduction de la luminosité")
+        self.cu.set_brightness(self.brightness)
+
+    def adjust_volume(self):
+        """Ajuste le volume en fonction des boutons de volume."""
+        if self.cu.is_pressed(CosmicUnicorn.SWITCH_VOLUME_UP):
+            if self.volume < 20000:  # Limite supérieure de la fréquence du son
+                self.volume = min(self.volume + 10, 20000)
+                self.channel.frequency(self.volume)
+                print(f"Augmentation du volume. Fréquence actuelle : {self.volume} Hz")
+        elif self.cu.is_pressed(CosmicUnicorn.SWITCH_VOLUME_DOWN):
+            if self.volume > 10:  # Limite inférieure de la fréquence du son
+                self.volume = max(self.volume - 10, 10)
+                self.channel.frequency(self.volume)
+                print(f"Diminution du volume. Fréquence actuelle : {self.volume} Hz")
 
     def display_digit(self, digit, col_start, row_start, color):
         """Affiche un chiffre à une position donnée sur l'écran."""
@@ -188,7 +223,7 @@ class CosmicUnicornDisplay:
         self.update()
 
     def display_clock(self, start_time, synced):
-        """Affiche l'heure actuelle synchronisée ou calculée."""
+        """Affiche l'heure actuelle synchronisée ou calculée avec correction de fuseau horaire."""
         current_time = time.localtime(time.time() + 11 * 3600 if synced else start_time + 11 * 3600)
         hour = "{:02}".format(current_time[3])
         minute = "{:02}".format(current_time[4])
@@ -238,8 +273,11 @@ class CosmicUnicornDisplay:
             self.play_bip(400)
             self.update_led_sound_status(False)
 
-    def update_led_sound_status(self, sound_status):
+    def update_led_sound_status(self, sound_status=None):
         """Met à jour l'état des LEDs indépendamment de l'affichage du smiley."""
+        if sound_status is None:
+            sound_status = self.sound_enabled
+
         if sound_status:
             self.set_pen('BLUE')
             for x, y in self.led_positions_on:
@@ -252,6 +290,20 @@ class CosmicUnicornDisplay:
             for x, y in self.led_positions_off_red:
                 self.graphics.pixel(x, y)
         self.update()
+
+    def toggle_loop_pause(self):
+        """Mets en pause/reprend la boucle d'affichage des agences et gère l'état de la LED."""
+        self.loop_paused = not self.loop_paused
+        if self.loop_paused:
+            print("Bouton B pressé - Mise en pause de la boucle")
+            self.set_pen('YELLOW')
+            self.graphics.pixel(*self.pause_led_position)
+            self.update()
+        else:
+            print("Bouton B pressé - Reprise de la boucle")
+            self.set_pen('BLACK')
+            self.graphics.pixel(*self.pause_led_position)
+            self.update()
 
 # Fonction pour arrêter proprement le script
 def stop_script():
@@ -363,15 +415,20 @@ def update_single_agency(api_key, agency):
 
 # Fonction pour gérer la pression des boutons
 def handle_button_press(cu):
-    """Gère la pression du bouton A pour activer/désactiver le son."""
+    """Gère la pression du bouton A pour activer/désactiver le son, du bouton B pour mettre en pause, et du volume."""
     if cu.is_pressed(CosmicUnicorn.SWITCH_A):
         display.toggle_sound()  # Appelle la fonction toggle_sound
         return True  # Retourne True si le bouton est pressé
+    if cu.is_pressed(CosmicUnicorn.SWITCH_B):
+        display.toggle_loop_pause()  # Gère la mise en pause/reprise avec le bouton B
+        return True
+    # Ajuste le volume avec les boutons correspondants
+    display.adjust_volume()
     return False
 
 # Boucle principale pour afficher les agences
 def main_loop(display, start_time, synced, api_key):
-    """Boucle principale qui gère l'affichage des agences et le statut du son."""
+    """Boucle principale qui gère l'affichage des agences, le son, et le volume."""
     display.display_message_frame_2("INIT")
     time.sleep(2)
 
@@ -413,10 +470,16 @@ def main_loop(display, start_time, synced, api_key):
             display.display_clock(start_time, synced)
             time.sleep(0.1)
 
-            # Gère la pression du bouton A
+            # Ajuste la luminosité et le volume en temps réel
+            display.adjust_brightness()
+            display.adjust_volume()
+
+            # Gère la pression des boutons A et B
             handle_button_press(display.cu)
 
-        current_index = (current_index + 1) % len(tableau_agences)
+        # Gestion de la pause pour le bouton B
+        if not display.loop_paused:
+            current_index = (current_index + 1) % len(tableau_agences)
 
 # Connexion Wi-Fi et lancement du script
 wifi_connected = connect_wifi('TP-Link_F41E', '27611708')
