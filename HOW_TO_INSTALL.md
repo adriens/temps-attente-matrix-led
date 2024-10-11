@@ -32,7 +32,7 @@ cd your-repository-directory
 
 # 3. Configure WiFi Credentials
 
-**Edit the cosmic_unicorn_script.py** file to provide your **WiFi credentials**.
+**Edit the cosmic_unicorn_script.py** file to provide your **WiFi credentials** => **line 514**
 
 Locate the connect_wifi() function.
 
