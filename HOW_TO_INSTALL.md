@@ -26,9 +26,7 @@ Clone the repository to your local machine:
 
 git clone https://github.com/your-repository-url.git
 
-Navigate to the project directory:
-
-cd your-repository-directory
+Navigate to the project directory: cd your-repository-directory
 
 # 3. Configure WiFi Credentials
 
@@ -36,9 +34,7 @@ cd your-repository-directory
 
 Locate the connect_wifi() function.
 
-Update the following lines with your SSID and password:
-
-**wifi_connected = connect_wifi('<your-SSID>', '<your-password>')**
+Update the following lines with your SSID and password: **wifi_connected = connect_wifi('<your-SSID>', '<your-password>')**
 
 # 4. Copy Files to Raspberry Pi Pico
 
