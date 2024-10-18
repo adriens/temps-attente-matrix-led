@@ -8,7 +8,7 @@ flowchart TD
 
     %% Forme doc en jaune
     doc>"Fichier .env"]:::yellow --> | Récupération ID <br>  Fichier .env | Wifi_Check
-    doc --> ApiKey_Check
+    doc --> | Récupération clé <br>  Fichier .env |ApiKey_Check
 
     %% Formes {} en vert
     classDef green fill:#c2e59c,stroke:#2e7d32,stroke-width:2px;
@@ -22,7 +22,7 @@ flowchart TD
     Wifi_Check -->|OK| NTP_Check
 
     NTP_Check -->|KO| Exit_NTP[Affichage NO NTP <br> => Sortie script]
-    NTP_Check -->|OK <br> Récupération clé <br>  Fichier .env| ApiKey_Check
+    NTP_Check -->|OK| ApiKey_Check
 
     ApiKey_Check -->|KO| Exit_ApiKey[Affichage NO API <br> => Sortie script]
     ApiKey_Check -->|OK| Dico[Dictionnaire <br> agences]
