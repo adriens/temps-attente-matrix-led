@@ -7,8 +7,8 @@ flowchart TD
     Start[Demarrage de la tablette <br> Lancement du script] --> Wifi_Check{Connexion <br> WIFI}
 
     %% Forme doc en jaune
-    doc>"Fichier .env"]:::yellow --> | Récupération ID <br>  Fichier .env | Wifi_Check
-    doc --> | Récupération clé <br>  Fichier .env |ApiKey_Check
+    doc>"Fichier .env"]:::yellow --> | Récupération ID | Wifi_Check
+    doc --> | Récupération clé |ApiKey_Check
 
     %% Formes {} en vert
     classDef green fill:#c2e59c,stroke:#2e7d32,stroke-width:2px;
