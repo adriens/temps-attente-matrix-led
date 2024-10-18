@@ -225,12 +225,12 @@ class CosmicUnicornDisplay:
             '1': [(1, 0), (1, 1), (1, 2), (1, 3), (1, 4)],
             '2': [(0, 0), (0, 2), (0, 3), (0, 4), (1, 0), (1, 2), (1, 4), (2, 0), (2, 1), (2, 2), (2, 4)],
             '3': [(0, 0), (1, 0), (2, 0), (2, 1), (2, 2), (2, 3), (2, 4), (1, 4), (0, 4), (1, 2), (0, 2)],
-            '4': [(0, 0), (0, 1), (0, 2), (1, 2), (2, 2), (2, 3), (2, 4), (2, 1), (2, 0)],
+            '4': [(0, 0), (0, 1), (0, 2), (1, 2), (2, 0), (2, 1), (2, 2), (2, 3), (2, 4)],
             '5': [(0, 0), (1, 0), (2, 0), (0, 1), (0, 2), (1, 2), (2, 2), (2, 3), (2, 4), (1, 4), (0, 4)],
             '6': [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (1, 4), (2, 4), (2, 3), (2, 2), (1, 2)],
-            '7': [(0, 0), (1, 0), (2, 0), (2, 1), (2, 2), (2, 3), (2, 4)],
-            '8': [(0, 0), (1, 0), (2, 0), (0, 2), (2, 2), (0, 4), (1, 4), (2, 4), (0, 1), (2, 1), (0, 3), (2, 3)],
-            '9': [(0, 0), (1, 0), (2, 0), (0, 2), (1, 2), (2, 2), (2, 1), (2, 3), (2, 4), (0, 1), (1, 4), (0, 4)]
+            '7': [(0, 0), (1, 0), (2, 0), (2, 1), (2, 2), (2, 3), (2, 4), (1, 2)],
+            '8': [(0, 0), (1, 0), (2, 0), (0, 1), (2  1), (0, 2), (1, 2), (2, 2), (0, 3), (2, 3), (0, 4), (1, 4), (2, 4)],
+            '9': [(0, 0), (1, 0), (2, 0), (0, 1), (2, 1), (0, 2), (1, 2), (2, 2), (2, 3), (2, 4), (1, 4), (0, 4)]
         }
         self.set_pen(color)  # Définit le stylo à la couleur donnée.
         for dx, dy in digits[digit]:  # Parcourt les coordonnées du chiffre et les affiche.
@@ -343,18 +343,18 @@ def stop_script():
     time.sleep(2)  # Pause de 2 secondes avant l'arrêt.
     raise SystemExit  # Arrête le script.
 
-# Fonction pour charger la clé API depuis un fichier.
-def load_api_key(file_path):
-    """Charge la clé API depuis un fichier."""
+# Fonction pour charger les informations de connexion WiFi et clé API depuis le fichier "information.env"
+def load_credentials(file_path):
+    """Charge les informations de connexion WiFi (SSID, mot de passe) et la clé API depuis un fichier."""
+    credentials = {}
     try:
-        with open(file_path, "r") as f:  # Ouvre le fichier contenant la clé API.
+        with open(file_path, "r") as f:  # Ouvre le fichier contenant les informations.
             for line in f:
-                if line.startswith("API_KEY"):  # Cherche la ligne contenant la clé API.
-                    api_key = line.strip().split('=')[1]  # Extrait la clé API.
-                    return api_key
+                key, value = line.strip().split('=')  # Sépare les lignes par '=' pour extraire les informations.
+                credentials[key.strip()] = value.strip()  # Stocke les informations dans un dictionnaire.
     except OSError:
         print(f"Erreur : impossible de trouver ou lire le fichier {file_path}")
-    return None  # Si erreur, retourne None.
+    return credentials  # Retourne le dictionnaire contenant les informations.
 
 # Fonction pour se connecter au WiFi
 def connect_wifi(ssid, password):
@@ -511,19 +511,16 @@ def main_loop(display, start_time, synced, api_key):
             current_index = (current_index + 1) % len(tableau_agences)  # Incrémente l'index et revient à 0 après la dernière agence
 
 # Connexion Wi-Fi et lancement du script
-wifi_connected = connect_wifi('TP-Link_F41E', '27611708')  # Se connecte au WiFi
+credentials = load_credentials("information.env")  # Charge les informations de connexion depuis le fichier
 
-if wifi_connected:
-    # Si la connexion WiFi est réussie, initialise l'affichage
+# Si la connexion WiFi est réussie, initialise l'affichage
+if connect_wifi(credentials['SSID'], credentials['WIFI_PASSWORD']):
     display = CosmicUnicornDisplay()
-
-    # Charge la clé API depuis le fichier
-    api_key = load_api_key("api_key.env")
 
     # Lancer la boucle principale
     start_time = time.time()  # Récupère l'heure actuelle au démarrage
     try:
-        main_loop(display, start_time, wifi_connected, api_key)  # Démarre la boucle principale
+        main_loop(display, start_time, True, credentials['API_KEY'])  # Démarre la boucle principale
     except KeyboardInterrupt:
         stop_script()  # Arrête proprement le script si une interruption clavier (Ctrl+C) est détectée
 else:
