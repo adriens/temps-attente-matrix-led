@@ -4,10 +4,10 @@
 flowchart TD
 
     %% Script de démarrage
-    Start[Demarrage de la tablette <br> Lancement du script] --> | Récupération ID <br>  Fichier .env | Wifi_Check{Connexion <br> WIFI}
+    Start[Demarrage de la tablette <br> Lancement du script] --> Wifi_Check{Connexion <br> WIFI}
 
     %% Forme doc en jaune
-    doc>"Fichier .env"]:::yellow --> Wifi_Check
+    doc>"Fichier .env"]:::yellow --> | Récupération ID <br>  Fichier .env | Wifi_Check
     doc --> ApiKey_Check
 
     %% Formes {} en vert
