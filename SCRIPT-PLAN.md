@@ -1,4 +1,4 @@
-# diagramme Mermaid pour représenter le fonctionnement du script 
+# Diagramme pour représenter le fonctionnement du script 
 
 ```mermaid
 flowchart TD
