@@ -1,22 +1,27 @@
 # Cosmic Unicorn Project Setup
 
-This guide explains how to set up the Cosmic Unicorn project, including configuring WiFi, copying necessary files, and deploying the display scenes. Follow these steps to get started:
+This guide explains how to set up the Cosmic Unicorn project, including configuring WiFi, copying necessary files, and deploying the display scenes. Follow these steps to get started.
 
 # Prerequisites
 
 **Hardware**: Pimoroni Cosmic-Unicorn 32x32 LED matrix with Raspberry Pi Pico W.
 
-**Software**: Thonny IDE, GitHub access, WiFi credentials.
+**Software**: Thonny IDE (required for file uploads and troubleshooting), GitHub access, WiFi credentials.
 
 **Files Needed**:
-  - cosmic_unicorn_script.py: The main Python script.
-  - .env: File containing the API key for accessing agency data.
+  - `boot.py`: The boot file to ensure the script runs automatically.
+  - `main.py`: The main Python script (formerly `cosmic_unicorn_script.py`).
+  - `information.env`: File containing WiFi credentials and the API key.
 
-# 1. Install Thonny IDE (optional)
+# 1. Install Thonny IDE
 
-Download Thonny IDE from thonny.org.
-Follow the installation instructions for your operating system.
-The Thonny IDE may be necessary in case of **debugging the script or its behavior. It can also be used to implement/modify the .env file**.
+Download and install Thonny IDE from [thonny.org](https://thonny.org/). Thonny is **required** for this project, but only to manage file uploads and necessary modifications (such as customizing the `information.env` file). Thonny can also be used to troubleshoot issues.
+
+## Using Thonny for the project:
+- **File Upload**: Use Thonny to upload `boot.py`, `main.py`, and `information.env` to the Pimoroni Cosmic-Unicorn.
+- **Modifying `information.env`**: Customize the WiFi credentials and API key in the `information.env` file.
+- **Troubleshooting**: Thonny is used to diagnose issues and test scripts on the tablet.
+
 
 # 2. Clone the GitHub Repository
 
@@ -29,8 +34,8 @@ Navigate to the project directory
 # 3. Configure WiFi Credentials
 
 **Edit the .env file** to provide your **WiFi credentials** :
-  SSID=<your-SSID>
-  PWD=<your-password>
+SSID=<your-SSID>
+WIFI_PASSWORD=<your-password>
 
 # 5. Configure API Key
 
@@ -40,23 +45,22 @@ Navigate to the project directory
 # 4. Copy Files to Raspberry Pi Pico
 
 Connect your Raspberry Pi Pico W to your computer.
-In Thonny, ensure the **correct interpreter** (Raspberry Pi Pico) is selected.
-Step 1: Verify that the COM port is active and connected to the Pico.
-Step 2: Save the following files to the Pico's root directory:
-  - `cosmic_unicorn_script.py`
-  - `.env`
-Step 3: Confirm that the script and API key file are correctly saved on the Pico by using the file browser in Thonny to view the files on the device.
+
+Open Thonny and select the correct interpreter for Raspberry Pi Pico W.
+Save the following files to the Pico’s root directory:
+- boot.py
+- main.py
+- information.env
+Use Thonny’s file browser to ensure these files are saved correctly on the Pico.
 
 # 6. Running the Script
 
-Open cosmic_unicorn_script.py in Thonny.
-Click the Run button to start executing the script.
-The Cosmic Unicorn will display the initial setup status and then proceed to show agency waiting times and clock.
+Once the files are uploaded, the Pimoroni Cosmic-Unicorn will run autonomously as soon as it is powered on. No further intervention via Thonny is required for final usage.
 
 # 7. Troubleshooting
 
-* **WiFi Not Connecting**: Ensure correct SSID/password, and check network availability.
-* **API Key Issues**: Make sure the API key in api_key.env is correct and the file is in the correct directory.
+* **WiFi Not Connecting**: Ensure correct SSID/password in the .env file and check network availability.
+* **API Key Issues**: Make sure the API key in the .env file is correct and the file is in the correct directory.
 * **Button Response Not Working**: Ensure the Cosmic Unicorn device buttons are functioning correctly and properly mapped.
 
 # 8. Updating the Script
