@@ -33,8 +33,8 @@ flowchart TD
     Exit_ApiKey --> Reboot
     Exit_NTP --> Reboot
 
-    API2_Check -->|KO <br> Pas de mise à jour du temps d'attente| ContinueNoUpdate[Poursuite du script <br> sans mise à jour]
-    API2_Check -->|OK <br> Mise à jour du temps d'attente| ContinueUpdate[Poursuite du script <br> avec mise à jour]
+    API2_Check -->|KO <br> Pas de mise à jour du temps d'attente| ContinueNoUpdate[Sans mise à jour <br> Temps d'attente]
+    API2_Check -->|OK <br> Mise à jour du temps d'attente| ContinueUpdate[Avec mise à jour <br> Temps d'attente]
 
     ContinueUpdate --> Affichage[Mise en place <br> affichage agence]
     ContinueNoUpdate --> Affichage
