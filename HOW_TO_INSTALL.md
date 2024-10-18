@@ -10,7 +10,7 @@ This guide explains how to set up the Cosmic Unicorn project, including configur
 
 **Files Needed**:
   - `boot.py`: The boot file to ensure the script runs automatically.
-  - `main.py`: The main Python script (formerly `cosmic_unicorn_script.py`).
+  - `main.py`: The main Python script.
   - `information.env`: File containing WiFi credentials and the API key.
 
 # 1. Install Thonny IDE
