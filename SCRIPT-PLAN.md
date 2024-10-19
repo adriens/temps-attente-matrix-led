@@ -4,7 +4,7 @@
 flowchart TD
 
     %% Script de démarrage
-    Start[Demarrage de la matrice LED <br> Lancement du script] --> Wifi_Check{Connexion <br> WIFI}
+    Start[Demarrage matrice LED <br> Lancement du script] --> Wifi_Check{Connexion <br> WIFI}
 
     %% Forme doc en jaune
     doc>"Fichier .env"]:::yellow --> | Récupération ID | Wifi_Check
