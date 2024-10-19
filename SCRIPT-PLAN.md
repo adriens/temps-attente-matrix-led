@@ -4,7 +4,7 @@
 flowchart TD
 
     %% Script de démarrage
-    Start[Demarrage de la tablette <br> Lancement du script] --> Wifi_Check{Connexion <br> WIFI}
+    Start[Demarrage de la matrice LED <br> Lancement du script] --> Wifi_Check{Connexion <br> WIFI}
 
     %% Forme doc en jaune
     doc>"Fichier .env"]:::yellow --> | Récupération ID | Wifi_Check
@@ -29,7 +29,7 @@ flowchart TD
 
     Dico --> API2_Check
 
-    Exit_Wifi --> Reboot[Verifier config <br> Redémarrer tablette]
+    Exit_Wifi --> Reboot[Verifier config <br> Redémarrer matrice]
     Exit_ApiKey --> Reboot
     Exit_NTP --> Reboot
 
