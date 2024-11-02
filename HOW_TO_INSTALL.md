@@ -20,7 +20,7 @@ Download and install Thonny IDE from [thonny.org](https://thonny.org/). Thonny i
 ## Using Thonny for the project:
 - **File Upload**: Use Thonny to upload `boot.py`, `main.py`, and `information.env` to the Pimoroni Cosmic-Unicorn.
 - **Modifying `information.env`**: Customize the WiFi credentials and API key in the `information.env` file.
-- **Troubleshooting**: Thonny is used to diagnose issues and test scripts on the tablet.
+- **Troubleshooting**: Thonny is used to diagnose issues and test scripts on the LED matrice.
 
 
 # 2. Clone the GitHub Repository
