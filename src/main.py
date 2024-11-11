@@ -38,7 +38,7 @@ class CosmicUnicornDisplay:
         self.scroll_shift = 0  # Variable de décalage pour le texte défilant.
         self.last_scroll_time = time.ticks_ms()  # Enregistre le dernier moment où le texte a défilé.
         self.transition_var = ''  # Variable pour stocker le texte défilant.
-        self.graphics.set_font("bitmap4")  # Définit la police utilisée pour l'affichage du texte.
+        self.graphics.set_font("bitmap5")  # Définit la police utilisée pour l'affichage du texte.
         self.sound_enabled = True  # Indique si le son est activé ou non.
         self.brightness = 0.5  # Définit la luminosité initiale de l'affichage.
         self.loop_paused = False  # Variable pour gérer la pause de la boucle d'affichage.
@@ -203,16 +203,16 @@ class CosmicUnicornDisplay:
             print(f"Erreur lors de la lecture du bip : {e}")  # Capture toute erreur et l'affiche.
 
     def adjust_brightness(self):
-        """Ajuste la luminosité en fonction des boutons de luminosité."""
-        if self.cu.is_pressed(CosmicUnicorn.SWITCH_BRIGHTNESS_UP):  # Si le bouton pour augmenter la luminosité est pressé.
-            if self.brightness < 1.0:  # Limite supérieure pour la luminosité.
-                self.brightness += 0.01  # Augmente la luminosité.
-            print("Bouton ajustement luminosité pressé - augmentation de la luminosité")
-        elif self.cu.is_pressed(CosmicUnicorn.SWITCH_BRIGHTNESS_DOWN):  # Si le bouton pour diminuer la luminosité est pressé.
-            if self.brightness > 0.0:  # Limite inférieure pour la luminosité.
-                self.brightness -= 0.01  # Diminue la luminosité.
-            print("Bouton ajustement luminosité pressé - réduction de la luminosité")
-        self.cu.set_brightness(self.brightness)  # Applique la nouvelle luminosité.
+        """Ajuste la luminosité en fonction des boutons de luminosité, avec confirmation de détection."""
+        if self.cu.is_pressed(CosmicUnicorn.SWITCH_BRIGHTNESS_UP):  # Si le bouton pour augmenter la luminosité est pressé
+            if self.brightness < 1.0:  # Limite supérieure pour la luminosité
+                self.brightness = min(self.brightness + 0.1, 1.0)  # Augmente la luminosité par paliers
+            print(f"Luminosité augmentée à : {self.brightness}")  # Message de débogage
+        elif self.cu.is_pressed(CosmicUnicorn.SWITCH_BRIGHTNESS_DOWN):  # Si le bouton pour diminuer la luminosité est pressé
+            if self.brightness > 0.0:  # Limite inférieure pour la luminosité
+                self.brightness = max(self.brightness - 0.1, 0.0)  # Diminue la luminosité par paliers
+            print(f"Luminosité diminuée à : {self.brightness}")  # Message de débogage
+        self.cu.set_brightness(self.brightness)  # Applique la nouvelle luminosité
 
     def adjust_volume(self):
         """Ajuste le volume en fonction des boutons de volume."""
@@ -413,103 +413,6 @@ LETTER_MAP_4 = {
     'D': [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (1, 0), (2, 0), (3, 1), (3, 2), (3, 3), (2, 4), (1, 4), (0, 4)],
 }
 
-def loading_animation_step(display, step):
-    """Affiche progressivement l'animation de chargement sur l'écran en fonction de l'étape."""
-    blocks = [
-        [(0, 30), (0, 31), (0, 32), (1, 30), (1, 31), (1, 32), (2, 30), (2, 31), (2, 32)],
-        [(3, 30), (3, 31), (3, 32), (4, 30), (4, 31), (4, 32), (5, 30), (5, 31), (5, 32)],
-        [(6, 30), (6, 31), (6, 32), (7, 30), (7, 31), (7, 32), (8, 30), (8, 31), (8, 32)],
-        [(9, 30), (9, 31), (9, 32), (10, 30), (10, 31), (10, 32), (11, 30), (11, 31), (11, 32)],
-        [(12, 30), (12, 31), (12, 32), (13, 30), (13, 31), (13, 32), (14, 30), (14, 31), (14, 32)],
-        [(15, 30), (15, 31), (15, 32), (16, 30), (16, 31), (16, 32), (17, 30), (17, 31), (17, 32)],
-        [(18, 30), (18, 31), (18, 32), (19, 30), (19, 31), (19, 32), (20, 30), (20, 31), (20, 32)],
-        [(21, 30), (21, 31), (21, 32), (22, 30), (22, 31), (22, 32), (23, 30), (23, 31), (23, 32)],
-        [(24, 30), (24, 31), (24, 32), (25, 30), (25, 31), (25, 32), (26, 30), (26, 31), (26, 32)],
-        [(27, 30), (27, 31), (27, 32), (28, 30), (28, 31), (28, 32), (29, 30), (29, 31), (29, 32)],
-        [(30, 30), (30, 31), (30, 32), (31, 30), (31, 31), (31, 32)]
-    ]
-
-    if step < len(blocks):
-        # Vérifie si la couleur 'WHITE' est définie
-        if 'WHITE' in display.pens:
-            display.set_pen('WHITE')
-        else:
-            print("Erreur : La couleur 'WHITE' n'est pas définie.")
-            return
-
-        # Dessine le bloc de LEDs pour l'étape en cours
-        for x, y in blocks[step]:
-            display.graphics.pixel(x, y)
-        display.update()
-        
-def exploding_heart_animation(display):
-    """Crée une animation d'un cœur explosant à partir d'une LED centrale, qui disparaît ensuite."""
-    # Définir la LED centrale de départ
-    center_led = (15, 15)
-    
-    # Liste des positions des LEDs formant le cœur final
-    heart_positions = [
-        (15, 12), (14, 11), (16, 11), (13, 10), (17, 10), 
-        (12, 9), (11, 9), (10, 9), (18, 9), (19, 9), (20, 9), 
-        (9, 10), (21, 10), (8, 11), (22, 11), (7, 12), (7, 13), 
-        (7, 14), (23, 12), (23, 13), (23, 14), (8, 15), (22, 15), 
-        (9, 16), (21, 16), (10, 17), (20, 17), (11, 18), (19, 18), 
-        (12, 19), (18, 19), (13, 20), (17, 20), (14, 21), (16, 21), (15, 22)
-    ]
-    
-    # Afficher la LED centrale
-    display.set_pen('PINK')
-    display.graphics.pixel(*center_led)
-    display.update()
-    time.sleep(0.2)  # Petite pause pour rendre l'animation visible
-
-    # Ajouter les LEDs petit à petit jusqu'à former le cœur final
-    for i, led in enumerate(heart_positions):
-        # Lorsque la moitié des LEDs sont allumées, éteindre la LED centrale
-        if i == len(heart_positions) // 2:
-            display.set_pen('BLACK')
-            display.graphics.pixel(*center_led)
-
-        # Afficher la LED courante du cœur
-        display.set_pen('PINK')
-        display.graphics.pixel(*led)
-        display.update()
-        time.sleep(0.05)  # Pause pour rendre l'animation progressive
-
-# Fonction d'affichage de l'écran d'accueil
-def display_welcome_screen(display):
-    """Affiche l'écran d'accueil initial avec les pixels identifiés pour chaque lettre de 'UNC OPT'."""
-    display.clear()  # Efface l'écran pour afficher uniquement le message d'accueil
-    exploding_heart_animation(display)  # Lancer l'animation du cœur explosant
-
-    # Coordonnées pour chaque caractère
-    coords = {
-        'U': [(2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (3, 6), (4, 6), (5, 6), (6, 6), (6, 5), (6, 4), (6, 3), (6, 2), (6, 1)],
-        'N': [(8, 1), (8, 2), (8, 3), (8, 4), (8, 5), (8, 6), (9, 2), (10, 3), (10, 4), (11, 5), (12, 6), (12, 5), (12, 4), (12, 3), (12, 2), (12, 1)],
-        'C': [(14, 1), (14, 2), (14, 3), (14, 4), (14, 5), (14, 6), (15, 1), (16, 1), (17, 1), (18, 1), (15, 6), (16, 6), (17, 6), (18, 6)],
-        'O': [(14, 25), (14, 26), (14, 27), (14, 28), (14, 29), (14, 30), (15, 30), (16, 30), (17, 30), (18, 25), (18, 26), (18, 27), (18, 28), (18, 29), (18, 30), (15, 25), (16, 25), (17, 25)],
-        'P': [(20, 25), (20, 26), (20, 27), (20, 28), (20, 29), (20, 30), (21, 25), (22, 25), (23, 25), (24, 25), (24, 26), (24, 27), (23, 27), (22, 27), (21, 27)],
-        'T': [(26, 25), (27, 25), (28, 25), (29, 25), (30, 25), (28, 26), (28, 27), (28, 28), (28, 29), (28, 30)]
-    }
-
-    # Définir les couleurs pour chaque partie du message
-    colors = {
-        'U': 'BLUE',
-        'N': 'BLUE',
-        'C': 'BLUE',
-        'O': 'YELLOW_SMILEY',
-        'P': 'YELLOW_SMILEY',
-        'T': 'YELLOW_SMILEY',
-    }
-
-    # Afficher chaque caractère avec sa couleur
-    for char, pixels in coords.items():
-        display.set_pen(colors[char])  # Choisit la couleur définie pour le caractère
-        for x, y in pixels:
-            display.graphics.pixel(x, y)  # Allume chaque pixel correspondant
-
-    display.update()  # Met à jour l'affichage avec le message complet
-
 # Fonction pour dessiner une lettre de la map 3 spécifique à une position donnée
 def draw_letter_3(graphics, letter, x, y, pen):
     if letter in LETTER_MAP_3:
@@ -545,69 +448,353 @@ def draw_word_4(graphics, word, x, y, pen, spacing=5):
             current_x += spacing  # Espacement entre les lettres
 
 
-# Fonction d'affichage de l'écran d'accueil
-def display_info_screen(self, wifi_status, api_key_status):
-    """Affiche l'état du WiFi et de la clé API sur l'écran d'information."""
+
+def show_loading_screen(display, step):
+    """Affiche l'animation de chargement et le texte WAIT avec la police bitmap5."""
+    display.clear()
+    display.graphics.set_font("bitmap5")  # Définit la police sur bitmap5
+    display.graphics.set_pen(display.pens['WHITE'])  # Choisit le stylo blanc
+    display.graphics.text("WAIT", 5, 12, scale=1)  # Affiche le texte "WAIT" en position (12, 14)
+    loading_animation_step(display, step)  # Exécute l'étape de l'animation de chargement
+    display.update()
+    time.sleep(0.2)  # Pause pour la synchronisation de l'animation
+
+
+def loading_animation_step(display, step):
+    """Affiche progressivement l'animation de chargement sur l'écran en fonction de l'étape."""
+    blocks = [
+        [(0, 30), (0, 31), (0, 32), (1, 30), (1, 31), (1, 32), (2, 30), (2, 31), (2, 32)],
+        [(3, 30), (3, 31), (3, 32), (4, 30), (4, 31), (4, 32), (5, 30), (5, 31), (5, 32)],
+        [(6, 30), (6, 31), (6, 32), (7, 30), (7, 31), (7, 32), (8, 30), (8, 31), (8, 32)],
+        [(9, 30), (9, 31), (9, 32), (10, 30), (10, 31), (10, 32), (11, 30), (11, 31), (11, 32)],
+        [(12, 30), (12, 31), (12, 32), (13, 30), (13, 31), (13, 32), (14, 30), (14, 31), (14, 32)],
+        [(15, 30), (15, 31), (15, 32), (16, 30), (16, 31), (16, 32), (17, 30), (17, 31), (17, 32)],
+        [(18, 30), (18, 31), (18, 32), (19, 30), (19, 31), (19, 32), (20, 30), (20, 31), (20, 32)],
+        [(21, 30), (21, 31), (21, 32), (22, 30), (22, 31), (22, 32), (23, 30), (23, 31), (23, 32)],
+        [(24, 30), (24, 31), (24, 32), (25, 30), (25, 31), (25, 32), (26, 30), (26, 31), (26, 32)],
+        [(27, 30), (27, 31), (27, 32), (28, 30), (28, 31), (28, 32), (29, 30), (29, 31), (29, 32)],
+        [(30, 30), (30, 31), (30, 32), (31, 30), (31, 31), (31, 32)]
+    ]
+
+    if step < len(blocks):
+        # Vérifie si la couleur 'WHITE' est définie
+        if 'WHITE' in display.pens:
+            display.set_pen('WHITE')
+        else:
+            print("Erreur : La couleur 'WHITE' n'est pas définie.")
+            return
+
+        # Dessine le bloc de LEDs pour l'étape en cours
+        for x, y in blocks[step]:
+            display.graphics.pixel(x, y)
+        display.update()
+        
+def display_welcome_screen(display):
+    """Affiche l'écran d'accueil avec 'UNC' défilant, puis dessine un bloc bleu autour de 'UNC' en inversant les couleurs."""
+    display.clear()  # Efface l'écran
+
+    # Utilisation des couleurs pré-définies
+    colors = {
+        'UNC': 'BLUE',
+        'OPT': 'YELLOW_SMILEY',
+    }
+    
+    # Charger la police bitmap5
+    display.graphics.set_font("bitmap5")
+
+    # Positions de départ hors écran
+    unc_x_start = display.width  # à droite, hors écran
+    opt_x_start = -display.graphics.measure_text("OPT", 1)  # à gauche, hors écran
+
+    # Positions finales
+    unc_x_final = 2
+    opt_x_final = 13
+
+    # Boucle de défilement pour les deux textes
+    while unc_x_start > unc_x_final or opt_x_start < opt_x_final:
+        display.clear()
+
+        # Afficher "UNC" en bleu, en défilant de droite à gauche
+        if unc_x_start > unc_x_final:
+            unc_x_start -= 1
+        display.set_pen(colors['UNC'])
+        display.graphics.text("UNC", unc_x_start, 1, scale=1)
+
+        # Afficher "OPT" en jaune smiley, en défilant de gauche à droite
+        if opt_x_start < opt_x_final:
+            opt_x_start += 1
+        display.set_pen(colors['OPT'])
+        display.graphics.text("OPT", opt_x_start, 24, scale=1)
+
+        # Mettre à jour l'affichage
+        display.update()
+        time.sleep(0.1)  # Ajustez pour la vitesse du défilement
+
+    # Texte "UNC" en position finale avec inversion des couleurs
+    display.set_pen(colors['UNC'])
+    display.graphics.text("UNC", unc_x_final, 1, scale=1)
+    display.update()
+    time.sleep(0.5)
+    # Couleur du fond en bleu et les lettres en noir
+    display.set_pen('BLUE')
+    for x in range(1, 19):
+        for y in range(1, 8):
+            display.graphics.pixel(x, y)
+    # Laisser les LEDs de "UNC" en noir en repassant par-dessus
+    display.set_pen('BLACK')
+    unc_pixels = {
+        # 'U'
+        (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (3, 6), (4, 6), (5, 6), (6, 6), (6, 2), (6, 3), (6, 4), (6, 5),
+        # 'N'
+        (8, 2), (8, 3), (8, 4), (8, 5), (8, 6), (9, 2), (10, 2), (11, 2), (12, 2), (12, 3), (12, 4), (12, 5), (12, 6),
+        # 'C'
+        (14, 2), (14, 3), (14, 4), (14, 5), (14, 6), (15, 2), (16, 2), (17, 2), (15, 6), (16, 6), (17, 6),
+    }
+    for (x, y) in unc_pixels:
+        display.graphics.pixel(x, y)
+
+    # Texte "OPT" en position finale avec inversion des couleurs
+    display.set_pen(colors['OPT'])
+    display.graphics.text("OPT", opt_x_final, 24, scale=1)
+    display.update()
+    time.sleep(0.5)
+    # Couleur du fond en jaune et les lettres en noir
+    display.set_pen('YELLOW_SMILEY')
+    for x in range(12, 31):
+        for y in range(24, 31):
+            display.graphics.pixel(x, y)  
+    # Laisser les LEDs de "OPT" en noir en repassant par-dessus
+    display.set_pen('BLACK')
+    opt_pixels = {
+        # 'O'
+        (13, 25), (13, 26), (13, 27), (13, 28), (13, 29), (14, 25), (15, 25), (16, 25), (14, 29), (15, 29), (16, 29), (17, 29), (17, 26), (17, 27), (17, 28), (17, 29), 
+        # 'P'
+        (19, 25), (19, 26), (19, 27), (19, 28), (19, 29), (20, 25), (21, 25), (22, 25), (21, 28), (22, 28), (23, 28), (23, 25), (23, 26), (23, 27),
+        # 'T'
+        (25, 25), (26, 25), (27, 25), (28, 25), (29, 25), (27, 25), (27, 26), (27, 27), (27, 28),
+    }
+    for (x, y) in opt_pixels:
+        display.graphics.pixel(x, y)
+
+    # Mettre à jour pour afficher les blocs finaux
+    display.update()
+    time.sleep(0.5)
+
+    # enchaîner avec l'animation
+    exploding_heart_animation(display)
+
+
+def exploding_heart_animation(display):
+    """Crée une animation d'un cœur explosant à partir d'une LED centrale, qui disparaît ensuite."""
+    # Définir la LED centrale de départ
+    center_led = (15, 15)
+    
+    # Liste des positions des LEDs formant le cœur final
+    heart_positions = [
+        (15, 12), (14, 11), (16, 11), (13, 10), (17, 10), 
+        (12, 9), (11, 9), (10, 9), (18, 9), (19, 9), (20, 9), 
+        (9, 10), (21, 10), (8, 11), (22, 11), (7, 12), (7, 13), 
+        (7, 14), (23, 12), (23, 13), (23, 14), (8, 15), (22, 15), 
+        (9, 16), (21, 16), (10, 17), (20, 17), (11, 18), (19, 18), 
+        (12, 19), (18, 19), (13, 20), (17, 20), (14, 21), (16, 21), (15, 22)
+    ]
+    
+    # Afficher la LED centrale
+    display.set_pen('PINK')
+    display.graphics.pixel(*center_led)
+    display.update()
+    time.sleep(0.2)  # Petite pause pour rendre l'animation visible
+
+    # Ajouter les LEDs petit à petit jusqu'à former le cœur final
+    for i, led in enumerate(heart_positions):
+        # Lorsque la moitié des LEDs sont allumées, éteindre la LED centrale
+        if i == len(heart_positions) // 2:
+            display.set_pen('BLACK')
+            display.graphics.pixel(*center_led)
+
+        # Afficher la LED courante du cœur
+        display.set_pen('PINK')
+        display.graphics.pixel(*led)
+        display.update()
+        time.sleep(0.05)  # Pause pour rendre l'animation progressive
+
+
+def display_info_screen(self, wifi_status, api_key_status, file_agences_status):
+    """Affiche l'état du WiFi, de la clé API, et du fichier agences.env sur l'écran d'information."""
     self.clear()  # Efface l'écran pour l'affichage des informations.
 
+    # Définir la police et la couleur
+    self.graphics.set_font("bitmap5")
+    self.graphics.set_pen(self.pens['WHITE'])
+
     # Affichage pour l'état du WiFi
+    self.graphics.text("WIFI", 1, 0, scale=1)
     if wifi_status:
-        draw_word_4(self.graphics, "WIFI ", 1, 2, self.pens['WHITE'])
-        draw_word_4(self.graphics, "OK", 22, 2, self.pens['GREEN'])
+        self.graphics.set_pen(self.pens['GREEN'])
+        self.graphics.text("OK", 21, 0, scale=1)
     else:
-        draw_word_4(self.graphics, "WIFI ", 1, 2, self.pens['WHITE'])
-        draw_word_4(self.graphics, "KO", 22, 2, self.pens['RED'])
+        self.graphics.set_pen(self.pens['RED'])
+        self.graphics.text("KO", 21, 0, scale=1)
 
     # Affichage pour l'état de la clé API
+    self.graphics.set_pen(self.pens['WHITE'])
+    self.graphics.text("API", 1, 8, scale=1)
     if api_key_status:
-        draw_word_4(self.graphics, "API ", 1, 10, self.pens['WHITE'])
-        draw_word_4(self.graphics, "OK", 22, 10, self.pens['GREEN'])
+        self.graphics.set_pen(self.pens['GREEN'])
+        self.graphics.text("OK", 21, 8, scale=1)
     else:
-        draw_word_3(self.graphics, "API ", 1, 10, self.pens['WHITE'])
-        draw_word_3(self.graphics, "KO", 22, 10, self.pens['RED'])
+        self.graphics.set_pen(self.pens['RED'])
+        self.graphics.text("KO", 21, 8, scale=1)
+
+    # Affichage pour l'état du fichier agences.env
+    self.graphics.set_pen(self.pens['WHITE'])
+    self.graphics.text(".ENV", 1, 16, scale=1)
+    if file_agences_status:
+        self.graphics.set_pen(self.pens['GREEN'])
+        self.graphics.text("OK", 21, 16, scale=1)
+    else:
+        self.graphics.set_pen(self.pens['RED'])
+        self.graphics.text("KO", 21, 16, scale=1)
+        
+    # Affichage url bitly
+    #self.graphics.set_pen(self.pens['WHITE'])
+    #self.graphics.text("https://bit.ly/3AJbpj2", 1, 23, scale=1)
 
     self.update()  # Met à jour l'affichage avec les informations.
 
-# Fonction d'affichage de l'écran d'accueil
-def display_legend_screen(display):
-    """Affiche l'écran légende avec les pixels identifiés"""
-    display.clear()  # Efface l'écran pour l'affichage des informations.
 
-    # Affichage légende pour le son OFF
-    if 'RED' in display.pens:
-        display.set_pen('RED')
-        sound_off_red = [(1, 2), (1, 3), (2, 1), (2, 2), (2, 3), (2, 4)]
-        for x, y in sound_off_red:
-            display.graphics.pixel(x, y)
-    else:
-        print("Erreur: Couleur 'RED' non définie dans display.pens")
+# Fonction d'affichage de l'écran des légendes
+def display_legend_screen(display, display_time=10):
+    """Affiche et fait défiler les légendes avec les LEDs et le texte alignés sur des lignes spécifiques, indépendamment."""
+    start_time = time.time()
+    display.clear()
+    
+    # Configuration des légendes : texte, couleur, LEDs en en-tête, zone d'affichage (y_start, y_end)
+    legends = [
+        {"message": "SON ACTIVE", "color": "BLUE", "leds": [(0, 1), (0, 2), (1, 0), (1, 1), (1, 2), (1, 3)], "y_start": 0, "text_y": -1},
+        {"message": "SON DESACTIVE", "color": "RED", "leds": [(0, 7), (0, 8), (1, 6), (1, 7), (1, 8), (1, 9)], "y_start": 6, "text_y": 5},
+        {"message": "PERTE WIFI", "color": "RED", "leds": [(0, 14), (1, 13), (1, 14), (1, 15), (2, 12), (2, 13), (2, 14), (2, 15), (2, 16)], "y_start": 12, "text_y": 11},
+        {"message": "NOM AGENCE FIXE", "color": "YELLOW", "leds": [(1, 20)], "y_start": 18, "text_y": 17},
+    ]
 
-    draw_word_3(display.graphics, "SON OFF", 5, 0, display.pens['WHITE'])
-
-    # Affichage légende pour le WiFi (OFF)
-    if 'RED' in display.pens:
-        display.set_pen('RED')
-        wifi_ko = [(0, 8), (1, 7), (1, 8), (1, 9), (2, 6), (2, 7), (2, 8), (2, 9), (2, 10)]
-        for x, y in wifi_ko:
-            display.graphics.pixel(x, y)
-    else:
-        print("Erreur: Couleur 'RED' non définie dans display.pens")
-
-    draw_word_3(display.graphics, "WIFI OFF", 5, 6, display.pens['WHITE'])
-
-    # Affichage légende pour la boucle (loop)
-    if 'YELLOW' in display.pens:
-        display.set_pen('YELLOW')
-        loop_led = [(1, 14)]
-        for x, y in loop_led:
-            display.graphics.pixel(x, y)
-    else:
-        print("Erreur: Couleur 'WHITE' non définie dans display.pens")
-
-    draw_word_3(display.graphics, "NOM FIX", 3, 12, display.pens['WHITE'])
-
-    # Met à jour l'affichage avec les informations.
+    for legend in legends:
+        display.set_pen(legend["color"])
+        for x_offset, y_offset in legend["leds"]:
+            display.graphics.pixel(x_offset, y_offset)
+        display.set_pen("WHITE")
+        display.graphics.text(legend["message"], 5, legend["text_y"], -1, 1)
     display.update()
+    time.sleep(3)
+
+    scroll_positions = [0] * len(legends)
+    last_update_times = [time.ticks_ms()] * len(legends)
+    message_widths = [display.graphics.measure_text(legend["message"], 1) for legend in legends]
+
+    # Boucle de défilement avec gestion indépendante pour chaque ligne
+    while time.time() - start_time < display_time:
+        time_ms = time.ticks_ms()
+
+        # Vérification immédiate du bouton pour basculer d'affichage
+        if display.cu.is_pressed(display.cu.SWITCH_C):
+            print("Bouton C pressé - Changement d'affichage depuis la screen légende.")
+            display.play_bip(500)
+            break  # Sortir immédiatement de la boucle
+
+        for i, legend in enumerate(legends):
+            if time_ms - last_update_times[i] > 100:
+                last_update_times[i] = time_ms
+                display.set_pen("BLACK")
+                display.graphics.rectangle(0, legend["y_start"], display.width, 5)
+                display.set_pen(legend["color"])
+                for x_offset, y_offset in legend["leds"]:
+                    display.graphics.pixel(x_offset - scroll_positions[i], y_offset)
+                display.set_pen("WHITE")
+                display.graphics.text(
+                    legend["message"],
+                    5 - scroll_positions[i],
+                    legend["text_y"],
+                    -1,
+                    1
+                )
+                if scroll_positions[i] >= message_widths[i] + display.width + 5:
+                    scroll_positions[i] = -display.width
+                    last_update_times[i] = time_ms + 3000
+                else:
+                    scroll_positions[i] += 1
+
+        display.update()
+        time.sleep(0.05)
+
+# QR CODE de l'adresse Bit.ly "https://bit.ly/3AJbpj2" (https://github.com/adriens/temps-attente-matrix-led)
+led_white_positions = [
+    (4, 4), (5, 4), (6, 4), (7, 4), (8, 4), (9, 4), (10, 4), (12, 4), (13, 4), (14, 4), (15, 4),
+    (18, 4), (19, 4), (22, 4), (23, 4), (24, 4), (25, 4), (26, 4), (27, 4), (28, 4), (4, 5),
+    (10, 5), (15, 5), (16, 5), (18, 5), (20, 5), (22, 5), (28, 5), (4, 6), (6, 6), (7, 6), (8, 6),
+    (10, 6), (13, 6), (15, 6), (17, 6), (19, 6), (20, 6), (22, 6), (24, 6), (25, 6), (26, 6),
+    (28, 6), (4, 7), (6, 7), (7, 7), (8, 7), (10, 7), (14, 7), (15, 7), (17, 7), (20, 7), (22, 7),
+    (24, 7), (25, 7), (26, 7), (28, 7), (4, 8), (6, 8), (7, 8), (8, 8), (10, 8), (14, 8), (15, 8),
+    (16, 8), (18, 8), (19, 8), (20, 8), (22, 8), (24, 8), (25, 8), (26, 8), (28, 8), (4, 9), (10, 9),
+    (13, 9), (15, 9), (17, 9), (22, 9), (28, 9), (4, 10), (5, 10), (6, 10), (7, 10), (8, 10), (9, 10),
+    (10, 10), (12, 10), (14, 10), (16, 10), (18, 10), (20, 10), (22, 10), (23, 10), (24, 10), (25, 10),
+    (26, 10), (27, 10), (28, 10), (12, 11), (13, 11), (16, 11), (17, 11), (18, 11), (19, 11), (4, 12),
+    (5, 12), (7, 12), (8, 12), (10, 12), (13, 12), (16, 12), (18, 12), (19, 12), (22, 12), (28, 12),
+    (4, 13), (6, 13), (7, 13), (14, 13), (19, 13), (20, 13), (23, 13), (24, 13), (25, 13), (26, 13),
+    (27, 13), (6, 14), (7, 14), (8, 14), (9, 14), (10, 14), (13, 14), (16, 14), (18, 14), (19, 14),
+    (20, 14), (21, 14), (25, 14), (28, 14), (6, 15), (9, 15), (12, 15), (19, 15), (22, 15), (25, 15),
+    (26, 15), (27, 15), (28, 15), (5, 16), (6, 16), (7, 16), (8, 16), (9, 16), (10, 16), (11, 16),
+    (13, 16), (14, 16), (20, 16), (22, 16), (23, 16), (28, 16), (4, 17), (6, 17), (11, 17), (12, 17),
+    (14, 17), (16, 17), (18, 17), (19, 17), (21, 17), (24, 17), (27, 17), (4, 18), (5, 18), (6, 18),
+    (7, 18), (8, 18), (9, 18), (10, 18), (12, 18), (13, 18), (19, 18), (21, 18), (22, 18), (24, 18),
+    (25, 18), (26, 18), (27, 18), (28, 18), (4, 19), (6, 19), (12, 19), (13, 19), (14, 19), (16, 19),
+    (18, 19), (20, 19), (22, 19), (23, 19), (25, 19), (26, 19), (28, 19), (4, 20), (6, 20), (8, 20),
+    (9, 20), (10, 20), (11, 20), (15, 20), (16, 20), (17, 20), (18, 20), (20, 20), (21, 20), (22, 20),
+    (23, 20), (24, 20), (26, 20), (27, 20), (12, 21), (14, 21), (15, 21), (18, 21), (19, 21), (20, 21),
+    (24, 21), (26, 21), (27, 21), (4, 22), (5, 22), (6, 22), (7, 22), (8, 22), (9, 22), (10, 22),
+    (13, 22), (16, 22), (18, 22), (20, 22), (22, 22), (24, 22), (28, 22), (4, 23), (10, 23), (15, 23),
+    (17, 23), (18, 23), (19, 23), (20, 23), (24, 23), (4, 24), (6, 24), (7, 24), (8, 24), (10, 24),
+    (12, 24), (14, 24), (15, 24), (17, 24), (19, 24), (20, 24), (21, 24), (22, 24), (23, 24), (24, 24),
+    (27, 24), (28, 24), (4, 25), (6, 25), (7, 25), (8, 25), (10, 25), (12, 25), (14, 25), (16, 25),
+    (17, 25), (18, 25), (20, 25), (22, 25), (27, 25), (28, 25), (4, 26), (6, 26), (7, 26), (8, 26),
+    (10, 26), (14, 26), (15, 26), (17, 26), (20, 26), (21, 26), (24, 26), (25, 26), (26, 26), (27, 26),
+    (28, 26), (4, 27), (10, 27), (12, 27), (13, 27), (15, 27), (16, 27), (17, 27), (23, 27), (24, 27),
+    (26, 27), (27, 27), (28, 27), (4, 28), (5, 28), (6, 28), (7, 28), (8, 28), (9, 28), (10, 28),
+    (12, 28), (13, 28), (14, 28), (15, 28), (16, 28), (17, 28), (20, 28), (21, 28), (25, 28), (28, 28)
+    ]
+
+
+# Fonction d'affichage du QR code avec intégration de la luminosité définie dans la classe
+def display_qr_code_screen(self):
+    self.clear()  # Efface l'écran pour un nouvel affichage
+
+    # Affichage du QR code en tenant compte de la luminosité actuelle
+    led_on_intensity = int(255 * self.brightness)
+    self.graphics.set_pen(self.graphics.create_pen(0, 0, 0))
+    self.graphics.clear()
+
+    for x, y in led_white_positions:
+        self.graphics.set_pen(self.graphics.create_pen(led_on_intensity, led_on_intensity, led_on_intensity))
+        self.graphics.pixel(x, y)
+
+    # Mettre à jour l'affichage pour refléter les changements
+    self.update()
+
+    # Boucle pour ajuster la luminosité en temps réel
+    while True:
+        self.adjust_brightness()  # Ajuste la luminosité en fonction des boutons de luminosité
+        led_on_intensity = int(255 * self.brightness)
+        for x, y in led_white_positions:
+            self.graphics.set_pen(self.graphics.create_pen(led_on_intensity, led_on_intensity, led_on_intensity))
+            self.graphics.pixel(x, y)
+        self.update()
+        
+        # Interruption de la boucle avec le bouton C
+        if self.cu.is_pressed(CosmicUnicorn.SWITCH_C):
+            print("Bouton C pressé - Quitter l'écran QR code.")
+            self.play_bip(500)  # Émettre un bip de confirmation
+            break  # Sortie de la boucle pour passer à l'écran suivant
+
+        time.sleep(0.1)
+
 
 # Attente de la pression du bouton pour démarrer le script principal
 def wait_for_start(display, cu):
@@ -710,35 +897,32 @@ def sync_time():
     print("Échec de la synchronisation NTP.")  # Affiche un message si aucun serveur NTP n'a pu être contacté
     return False  # Retourne False si la synchronisation échoue
 
-# Fonction pour récupérer les données des agences via l'API
-def get_agency_data(api_key):
-    """Récupère les données des agences en utilisant l'API avec la clé fournie."""
-    url = "https://api.opt.nc/temps-attente-agences/csv"  # URL de l'API qui fournit les données des agences
-    headers = {"x-apikey": api_key}  # Ajoute l'API Key aux en-têtes HTTP pour l'authentification
+def load_agencies(file_path):
+    """Charge les agences et leurs noms depuis le fichier agences.env."""
+    agencies = []
+    file_loaded = False
     try:
-        response = requests.get(url, headers=headers)  # Effectue une requête GET à l'API
-        print(f"Appel API pour récupérer les données des agences, statut: {response.status_code}")  # Affiche le code de statut HTTP de la réponse
-        if response.status_code == 200:  # Si la requête réussit
-            print(f"Réponse API: {response.text}")  # Affiche la réponse de l'API
-            return parse_csv_data(response.content.decode('utf-8'))  # Analyse les données CSV de l'API
-        else:
-            print(f"Erreur API : Statut {response.status_code}")  # Affiche un message d'erreur si la requête échoue
-    except Exception as e:
-        print(f"Erreur lors de l'appel API : {e}")  # Affiche une erreur si une exception est levée
-    return None  # Retourne None si les données n'ont pas pu être récupérées
+        with open(file_path, "r") as f:
+            for line in f:
+                if line.strip():  # Ignorer les lignes vides
+                    id, name = line.strip().split("=")
+                    agencies.append([id.strip(), name.strip().strip('"'), 0])  # Ajoute l'agence avec un temps d'attente initial de 0
+        file_loaded = True
+        print("Agences chargées depuis agences.env:", agencies)
+    except OSError:
+        print(f"Erreur : impossible de trouver ou lire le fichier {file_path}")
+    return agencies, file_loaded  # Retourne la liste des agences et le statut de chargement
 
-# Fonction pour analyser le CSV des agences
-def parse_csv_data(csv_content):
-    """Analyse les données CSV des agences et les convertit en tableau exploitable."""
-    rows = csv_content.split("\n")  # Divise le contenu du fichier CSV en lignes
-    data = [row.split(",") for row in rows[1:] if row.strip()]  # Divise chaque ligne en colonnes (par virgules) et ignore les lignes vides
-    tableau_agences = []  # Liste pour stocker les données des agences
-    for row in data:  # Parcourt chaque ligne de données
-        agence_id = row[0].strip()  # Récupère l'ID de l'agence
-        designation = normalize_name(row[1].strip().replace("Agence de ", "").upper())  # Récupère et normalise le nom de l'agence
-        realMaxWaitingTimeMs = int(row[2].strip())  # Convertit le temps d'attente maximum en entier
-        tableau_agences.append([agence_id, designation, realMaxWaitingTimeMs])  # Ajoute l'agence à la liste
-    return tableau_agences  # Retourne la liste des agences
+def initialize_agency_wait_times(api_key, agencies):
+    """Initialise les temps d'attente pour les deux premières agences dans la liste."""
+    if agencies:
+        # Mettre à jour le temps d'attente pour l'agence à l'index 0
+        if not update_single_agency(api_key, agencies[0]):
+            print(f"Erreur de mise à jour du temps d'attente pour l'agence {agencies[0][1]}")
+        # Mettre à jour le temps d'attente pour l'agence à l'index 1 si elle existe
+        if len(agencies) > 1 and not update_single_agency(api_key, agencies[1]):
+            print(f"Erreur de mise à jour du temps d'attente pour l'agence {agencies[1][1]}")
+
 
 # Fonction pour mettre à jour une seule agence avant l'affichage
 def update_single_agency(api_key, agency):
@@ -748,6 +932,7 @@ def update_single_agency(api_key, agency):
     headers = {"x-apikey": api_key}  # Ajoute l'API Key aux en-têtes HTTP
     try:
         response = requests.get(url, headers=headers)  # Effectue une requête GET pour récupérer les nouvelles données de l'agence
+        gc.collect()  # Libère la mémoire immédiatement après la requête
         print(f"Appel API pour agence {name} (ID: {agence_id}), statut: {response.status_code}")  # Affiche le statut de la réponse API
         if response.status_code == 200:  # Si la requête réussit
             data = response.json()  # Convertit la réponse en format JSON
@@ -775,34 +960,33 @@ def handle_button_press(cu, display):
     display.adjust_volume()  # Ajuste le volume avec les boutons de volume
 
 
-def main_loop(display, start_time, synced, api_key, wlan):
+def main_loop(display, start_time, synced, api_key, wlan, tableau_agences):
     display.clear()  # Efface l'écran avant d'afficher le message d'attente
     display.display_message_frame_2("WAIT")
+    print("Début de la boucle principale - affichage initial WAIT")
     time.sleep(2)
 
-    tableau_agences = get_agency_data(api_key)
-    if not tableau_agences:
-        display.display_message_frame_2("NO API")
-        time.sleep(5)
-        return
+    # Initialiser la mise à jour des temps d'attente pour les deux premières agences
+    if not update_single_agency(api_key, tableau_agences[0]):
+        print("Erreur de mise à jour pour l'agence", tableau_agences[0][1])
+    if len(tableau_agences) > 1 and not update_single_agency(api_key, tableau_agences[1]):
+        print("Erreur de mise à jour pour l'agence", tableau_agences[1][1])
 
     current_index = 0
 
     while True:
         try:
-            # Vérification WiFi une seule fois au début de chaque agence
+            print(f"Affichage agence - itération pour l'agence index {current_index}")
             wifi_status = display.check_wifi_status(wlan)
             display.update_led_wifi_status(wifi_status)
 
             agence_id, name, waiting_time = tableau_agences[current_index]
 
-            # Mise à jour des données de l'agence
             if update_single_agency(api_key, tableau_agences[current_index]):
                 print(f"Agence mise à jour : {name}, Temps d'attente mis à jour.")
             else:
                 print(f"Affichage des anciennes données pour : {name}")
 
-            # Détermine l'humeur en fonction du temps d'attente
             mood = 'happy' if waiting_time < 300000 else 'neutral' if waiting_time < 600000 else 'sad'
             display.clear()
             display.draw_frame(0, 6, 'YELLOW')
@@ -812,22 +996,18 @@ def main_loop(display, start_time, synced, api_key, wlan):
 
             print(f"Agence affichée : {name}, ID : {agence_id}, Temps d'attente : {waiting_time // 60000} minutes")
 
-            # Affichage de l'agence et défilement du texte
             iteration_count = 0
             while iteration_count < 100:
-                # Bouton C - Retour à l'écran d'accueil
                 if display.cu.is_pressed(CosmicUnicorn.SWITCH_C):
                     print("Bouton C pressé - Retour à l'écran d'accueil.")
-                    display.play_bip(500)  # Émettre un bip
-                    time.sleep(0.5)  # Petite pause pour éviter les rebonds du bouton
+                    display.play_bip(500)
+                    time.sleep(0.5)
                     return
 
-                # Bouton B - Mettre en pause/reprendre la boucle
                 if display.cu.is_pressed(CosmicUnicorn.SWITCH_B):
                     display.toggle_loop_pause()
-                    time.sleep(0.5)  # Petite pause pour éviter les rebonds du bouton
+                    time.sleep(0.5)
 
-                # Si la boucle est en pause, continue le défilement du texte et l'affichage de l'heure
                 if display.loop_paused:
                     display.scroll_text(display.transition_var)
                     display.display_clock(start_time, synced)
@@ -837,7 +1017,6 @@ def main_loop(display, start_time, synced, api_key, wlan):
                     time.sleep(0.1)
                     continue
 
-                # Défilement normal si la boucle n'est pas en pause
                 display.scroll_text(display.transition_var)
                 display.display_clock(start_time, synced)
                 display.adjust_brightness()
@@ -846,75 +1025,101 @@ def main_loop(display, start_time, synced, api_key, wlan):
                 time.sleep(0.1)
                 iteration_count += 1
 
-            # Passe à l'agence suivante si la boucle n'est pas en pause
+            next_index = (current_index + 1) % len(tableau_agences)
+            if not update_single_agency(api_key, tableau_agences[next_index]):
+                print("Erreur de mise à jour pour l'agence", tableau_agences[next_index][1])
+
             if not display.loop_paused:
-                current_index = (current_index + 1) % len(tableau_agences)
+                current_index = next_index
 
         except Exception as e:
-            print(f"Erreur lors de la boucle d'affichage des agences : {e}")
-            time.sleep(2)  # Attente avant de réessayer en cas d'erreur
-
-        # Désactiver les LEDs du son en quittant l'affichage de l'agence
+            print(f"Erreur dans la boucle d'affichage des agences : {e}")
+            time.sleep(2)
         display.update_led_sound_status(False)
-
-
 
 # Fonction main pour afficher la page d'accueil avec le message "UNC OPT".
 def main():
-    """Fonction principale qui initialise l'affichage de l'accueil et attend le bouton C pour démarrer."""
+    """Fonction principale avec affichage initial et basculement vers l'écran d'accueil."""
     display = CosmicUnicornDisplay()  # Initialise l'affichage
-    cu = display.cu  # Récupère l'instance pour gérer les boutons
+    cu = display.cu  # Gestion des boutons
 
+    # Affichage de l'écran "WAIT" au démarrage
+    step = 0
+    show_loading_screen(display, step)
+    print("Affichage initial 'WAIT'")
+    step += 1
+
+    # Charger les informations WiFi et API
     credentials = load_credentials("information.env")
+    if not credentials:
+        print("Erreur : Informations de connexion non trouvées.")
+        stop_script(display)
+        return
+
     wlan = connect_wifi(credentials['SSID'], credentials['WIFI_PASSWORD'], display)
+    if wlan is None:
+        print("Erreur de connexion WiFi. Arrêt du script.")
+        stop_script(display, wifi_issue=True)
+        return
+
+    show_loading_screen(display, step)
+    step += 1
+    tableau_agences, file_agences_status = load_agencies("agences.env")
+    if not file_agences_status:
+        print("Erreur : Impossible de charger les agences.")
+        stop_script(display)
+        return
+
+    show_loading_screen(display, step)
+    step += 1
 
     if wlan:
         synced = sync_time()
         start_time = time.time()
-        wifi_status = True  # Initialisation à True si la connexion est établie
+        wifi_status = True
     else:
-        print("Impossible de démarrer le script sans connexion Wi-Fi.")
-        stop_script(display, wifi_issue=True)  # Afficher "NO WIFI\n REBOOT" et attendre la pression du bouton D
+        stop_script(display, wifi_issue=True)
         return
 
+    show_loading_screen(display, step)
+    step += 1
+
     api_key_status = credentials.get('API_KEY') is not None
+    initialize_agency_wait_times(credentials['API_KEY'], tableau_agences)
 
-    # Liste des fonctions d'affichage (accueil, info, légende, agences)
+    show_loading_screen(display, step)
+    print("Chargement terminé.")
+    step += 1
+
+    # Modes d'affichage et configuration
     display_modes = [
-        display_welcome_screen,  # Appelle la fonction d'accueil avec l'animation du cœur
-        display_info_screen,
-        display_legend_screen,
-        lambda d: main_loop(d, start_time, synced, credentials['API_KEY'], wlan)  # Main loop pour les agences
+        display_welcome_screen,
+        lambda d: display_info_screen(d, wifi_status, api_key_status, file_agences_status),
+        lambda d: display_legend_screen(d, display_time=15),
+        lambda d: main_loop(d, start_time, synced, credentials['API_KEY'], wlan, tableau_agences),
+        display_qr_code_screen
     ]
-
     current_mode = 0
 
-    while True:
-        # Mettez à jour `display_mode` pour indiquer quel écran est affiché
-        display.display_mode = current_mode
+    # Forcer le passage initial au premier écran après le chargement
+    display.display_mode = current_mode
+    display_modes[current_mode](display)
 
-        # Appel de la fonction d'affichage appropriée avec les bons arguments
-        if current_mode == 1:  # Mode info, nécessite wifi_status et api_key_status
-            display_modes[current_mode](display, wifi_status, api_key_status)
-        else:
+    while True:
+        handle_button_press(cu, display)
+
+        if cu.is_pressed(CosmicUnicorn.SWITCH_C):
+            current_mode = (current_mode + 1) % len(display_modes)
+            display.display_mode = current_mode
+            display.play_bip(500)
+            print("Passage au mode suivant.")
+            time.sleep(0.5)
             display_modes[current_mode](display)
 
-        while True:
-            handle_button_press(cu, display)
-
-            if cu.is_pressed(CosmicUnicorn.SWITCH_C):
-                current_mode = (current_mode + 1) % len(display_modes)
-                display.display_mode = current_mode  # Mettre à jour le mode d'affichage
-                display.play_bip(500)  # Émettre un bip à chaque pression de C
-                time.sleep(0.5)
-                break
-
-            time.sleep(0.1)
+        time.sleep(0.1)
 
 
 # Démarrer le programme avec la fonction main()
 main()
-
-
 
 
