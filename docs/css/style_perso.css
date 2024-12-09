@@ -1,0 +1,75 @@
+/* Animation de transparence de 0 % vers 100 % */
+.fade-in {
+  opacity: 0; /* Commencer invisible */
+  animation: fadeInEffect 3s forwards;
+}
+
+@keyframes fadeInEffect {
+  from {
+    opacity: 0; /* 0 % opaque */
+  }
+  to {
+    opacity: 1; /* 100 % opaque */
+  }
+}
+
+/* Style des flèches */
+.arrow {
+    display: flex;
+    align-items: center;
+    animation: fadeInArrow 1s ease-in-out forwards;
+}
+
+.arrow-line {
+    width: 0;
+    height: 2px;
+    background-color: #ffffff;
+    animation: drawLine 1s ease-in-out forwards;
+}
+
+.arrow-text {
+    margin-left: 10px;
+    color: #ffffff;
+    font-size: 0.8em; /* Taille similaire à h6 */
+    opacity: 0;
+    animation: fadeInText 1s ease-in-out forwards;
+    animation-delay: 0.5s;
+}
+
+/* Animation de la ligne de la flèche */
+@keyframes drawLine {
+    from { width: 0; }
+    to { width: 50px; } /* Ajustez la longueur selon le besoin */
+}
+
+/* Animation de l'apparition du texte */
+@keyframes fadeInText {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Animation de l'apparition de la flèche */
+@keyframes fadeInArrow {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.small-underline-text {
+    font-size: 0.7em; /* Ajustez pour rendre le texte plus petit */
+    text-decoration: underline;
+    color: #ffffff; /* Assurez-vous que la couleur est visible */
+}
+
+.section-block {
+    margin-bottom: 20px; /* Ajuste cet espace si nécessaire */
+    padding-bottom: 10px; /* Espace intérieur en bas du bloc */
+    border-bottom: 2px solid #ccc; /* Bordure grise en bas du bloc */
+}
+
+    .section-block h2 {
+        margin: 0;
+    }
+
+    .section-block h5 {
+        margin: 5px 0 0 0;
+    }
