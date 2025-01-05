@@ -44,21 +44,21 @@ class CosmicUnicornDisplay:
         self.loop_paused = False  # Variable pour gérer la pause de la boucle d'affichage.
         self.volume = 500  # Fréquence initiale du bip sonore.
         self.pause_led_position = (1, 25)  # Position de la LED indiquant une pause.
-        self.led_positions_on = [(2, 9), (1, 10), (2, 10), (1, 11), (2, 11), (2, 12)]  # Positions des LEDs quand le son est activé.
-        self.led_positions_off_red = [(2, 9), (1, 10), (2, 10), (1, 11), (2, 11), (2, 12)]  # Positions des LEDs rouges quand le son est désactivé.
-        self.led_positions_off_blue = [(2, 9), (1, 10), (2, 10), (1, 11), (2, 11), (2, 12)]  # Positions des LEDs bleues quand le son est désactivé.
+        self.led_positions_sound_on = [(2, 9), (1, 10), (2, 10), (1, 11), (2, 11), (2, 12)]  # Positions des LEDs quand le son est activé.
+        self.led_positions_sound_off = [(2, 9), (1, 10), (2, 10), (1, 11), (2, 11), (2, 12)]  # Positions des LEDs rouges quand le son est désactivé.
         self.led_positions_wifi_ko = [(0, 17), (1, 16), (1, 17), (1, 18), (2, 15), (2, 16), (2, 17), (2, 18), (2, 19)]
         self.channel = self.cu.synth_channel(5)  # Canal sonore pour gérer les bips sonores.
         self.cu.set_brightness(self.brightness)  # Définit la luminosité initiale de l'écran.
-        self.display_mode = 0  # Variable pour suivre le mode d'affichage
-        self.update_led_sound_status(self.sound_enabled)  # Met à jour les LEDs selon l'état du son.
+        self.display_mode = 0  # 0: Accueil, 1: Info, 2: Légende, 3: Agences, 4: QR Code
+        self.update_led_sound_status()  # Met à jour les LEDs selon l'état du son.
+        self.previous_wifi_status = False 
         print("Affichage initialisé avec succès")  # Confirmation de l'initialisation réussie.
 
     def clear(self):
         """Efface l'écran sans toucher aux LEDs du son et de pause."""
         self.graphics.set_pen(self.pens['BLACK'])  # Définit la couleur du stylo à noir pour effacer.
         self.graphics.clear()  # Efface l'écran.
-        self.update_led_sound_status(self.sound_enabled)  # Met à jour les LEDs du son.
+        self.update_led_sound_status()  # Met à jour les LEDs du son.
         self.update_led_wifi_status(self.check_wifi_status(network.WLAN(network.STA_IF)))  # Maintient l'état des LEDs WiFi
         if self.loop_paused:  # Si la boucle est en pause, affiche la LED de pause.
             self.set_pen('YELLOW')
@@ -254,8 +254,8 @@ class CosmicUnicornDisplay:
         hour = "{:02}".format(current_time[3])  # Récupère l'heure actuelle (HH).
         minute = "{:02}".format(current_time[4])  # Récupère les minutes actuelles (MM).
         second = current_time[5]  # Récupère les secondes actuelles (SS).
-        self.display_digit(hour[0], 14, 1, 'WHITE')  # Affiche le premier chiffre des heures.
-        self.display_digit(hour[1], 18, 1, 'WHITE')  # Affiche le deuxième chiffre des heures.
+        self.display_digit(hour[0], 14, 1, 'YELLOW_SMILEY')  # Affiche le premier chiffre des heures.
+        self.display_digit(hour[1], 18, 1, 'YELLOW_SMILEY')  # Affiche le deuxième chiffre des heures.
         if second % 2 == 0:  # Si les secondes sont paires, affiche les deux points de séparation.
             self.graphics.pixel(22, 2)
             self.graphics.pixel(22, 4)
@@ -263,8 +263,8 @@ class CosmicUnicornDisplay:
             self.set_pen('BLACK')
             self.graphics.pixel(22, 2)
             self.graphics.pixel(22, 4)
-        self.display_digit(minute[0], 24, 1, 'WHITE')  # Affiche le premier chiffre des minutes.
-        self.display_digit(minute[1], 28, 1, 'WHITE')  # Affiche le deuxième chiffre des minutes.
+        self.display_digit(minute[0], 24, 1, 'YELLOW_SMILEY')  # Affiche le premier chiffre des minutes.
+        self.display_digit(minute[1], 28, 1, 'YELLOW_SMILEY')  # Affiche le deuxième chiffre des minutes.
         self.update()  # Met à jour l'affichage.
 
     def set_transition_variable(self, name):
@@ -290,35 +290,37 @@ class CosmicUnicornDisplay:
     # Fonction pour activer ou désactiver le son et mettre à jour les LEDs correspondantes.
     def toggle_sound(self):
         """Active ou désactive le son et met à jour les LEDs en conséquence."""
-        self.sound_enabled = not self.sound_enabled  # Inverse l'état du son.
+        self.sound_enabled = not self.sound_enabled  # Inverse l'état du son
         if self.sound_enabled:
-            print("Bouton A pressé - Activation du son")
-            self.play_bip(500)  # Joue un bip à une certaine fréquence.
-            self.update_led_sound_status(True)  # Met à jour les LEDs pour indiquer que le son est activé.
+            print("Son activé")
+            self.play_bip(500)  # Émet un bip sonore
         else:
-            print("Bouton A pressé - Désactivation du son")
-            self.play_bip(400)  # Joue un bip différent pour indiquer la désactivation du son.
-            self.update_led_sound_status(False)  # Met à jour les LEDs pour indiquer que le son est désactivé.
+            print("Son désactivé")
+            self.play_bip(400)  # Émet un bip différent
+        self.update_led_sound_status()  # Met à jour l'état des LEDs
 
     # Fonction pour mettre à jour les LEDs en fonction de l'état du son (activé ou désactivé).
-    def update_led_sound_status(self, sound_status=None):
-        """Met à jour l'état des LEDs indépendamment de l'affichage du smiley, uniquement pendant l'affichage des agences."""
-        if sound_status is None:
-            sound_status = self.sound_enabled
-
-        if self.display_mode == 3:  # Mettre à jour les LEDs uniquement dans le mode agence (mode 3)
-            if sound_status:
+    def update_led_sound_status(self):
+        """Met à jour les LEDs pour afficher l'état du son uniquement dans le mode agences."""
+        if self.display_mode == 3:  # Afficher uniquement dans le mode agences
+            if self.sound_enabled:
                 self.set_pen('BLUE')
-                for x, y in self.led_positions_on:
+                for x, y in self.led_positions_sound_on:
                     self.graphics.pixel(x, y)
             else:
-                self.set_pen('BLUE')
-                for x, y in self.led_positions_off_blue:
-                    self.graphics.pixel(x, y)
                 self.set_pen('RED')
-                for x, y in self.led_positions_off_red:
+                for x, y in self.led_positions_sound_off:
                     self.graphics.pixel(x, y)
             self.update()
+        else:
+            self.clear_sound_leds()  # Efface les LEDs si ce n'est pas le bon mode
+    
+    def clear_sound_leds(self):
+        """Efface les LEDs utilisées pour le statut du son."""
+        self.set_pen('BLACK')
+        for x, y in self.led_positions_sound_on:  # Même positions pour nettoyage
+            self.graphics.pixel(x, y)
+        self.update()
 
     # Fonction pour mettre en pause ou reprendre la boucle d'affichage des agences.
     def toggle_loop_pause(self):
@@ -348,22 +350,21 @@ class CosmicUnicornDisplay:
         self.update()  # Met à jour l'affichage pour appliquer les changements
     
     def check_wifi_status(self, wlan):
-        """Vérifie l'état de la connexion WiFi, met à jour l'affichage LED et arrête le script si nécessaire."""
+        """Vérifie l'état de la connexion WiFi et met à jour l'état des LEDs."""
         global attempts
         if wlan.isconnected():
-            print("WIFI OK")
+            if not self.previous_wifi_status:
+                print("WIFI OK")
+                self.previous_wifi_status = True  # Mise à jour du statut
             attempts = 0  # Réinitialiser le compteur d'échecs
             return True
         else:
-            print("WIFI KO")
+            if self.previous_wifi_status:
+                print("WIFI KO")
+                self.previous_wifi_status = False
             attempts += 1  # Incrémenter la variable d'échecs
-    
-            # Émission d'un bip pour signaler la perte de connexion
-            self.play_bip(1000)  # Bip sonore pour signaler l'échec de connexion
-    
-            # Si la variable attempts dépasse 5, déclencher l'arrêt du script
             if attempts > 10:
-                stop_script(self, wifi_issue=True)  # Spécifie que l'arrêt est dû à un problème de WiFi
+                stop_script(self, wifi_issue=True)
             return False
 
 # Matrices pour les lettres avec une largeur de 3 LED et une hauteur de 5 LED
@@ -437,17 +438,15 @@ def draw_letter_4(graphics, letter, x, y, pen):
 
 
 # Fonction pour dessiner un mot entier en map 4
-def draw_word_4(graphics, word, x, y, pen, spacing=5):
-    """Dessine un mot entier en utilisant la lettre de taille 4 LED de largeur et 5 LED de hauteur."""
+def draw_word_4(graphics, word, x, y, display, color_name, spacing=5):
+    """Dessine un mot entier en utilisant la lettre de taille 4 LED."""
+    display.set_pen(color_name)  # Utilise set_pen pour appliquer la couleur
     current_x = x
     for letter in word:
         if letter in LETTER_MAP_4:
-            graphics.set_pen(pen)
             for dx, dy in LETTER_MAP_4[letter]:
                 graphics.pixel(current_x + dx, y + dy)
             current_x += spacing  # Espacement entre les lettres
-
-
 
 def show_loading_screen(display, step):
     """Affiche l'animation de chargement et le texte WAIT avec la police bitmap5."""
@@ -491,6 +490,7 @@ def loading_animation_step(display, step):
         
 def display_welcome_screen(display):
     """Affiche l'écran d'accueil avec 'UNC' défilant, puis dessine un bloc bleu autour de 'UNC' en inversant les couleurs."""
+    display.display_mode = 0
     display.clear()  # Efface l'écran
 
     # Utilisation des couleurs pré-définies
@@ -621,6 +621,7 @@ def exploding_heart_animation(display):
 
 def display_info_screen(self, wifi_status, api_key_status, file_agences_status):
     """Affiche l'état du WiFi, de la clé API, et du fichier agences.env sur l'écran d'information."""
+    self.display_mode = 1
     self.clear()  # Efface l'écran pour l'affichage des informations.
 
     # Définir la police et la couleur
@@ -664,67 +665,38 @@ def display_info_screen(self, wifi_status, api_key_status, file_agences_status):
 
 
 # Fonction d'affichage de l'écran des légendes
-def display_legend_screen(display, display_time=10):
-    """Affiche et fait défiler les légendes avec les LEDs et le texte alignés sur des lignes spécifiques, indépendamment."""
-    start_time = time.time()
+def display_legend_screen(display):
+    """
+    Affiche les messages en lettres spécifiques avec leur couleur et les LED icônes.
+    Les messages sont ajustés pour être alignés avec leurs icônes LED.
+    """
     display.clear()
-    
-    # Configuration des légendes : texte, couleur, LEDs en en-tête, zone d'affichage (y_start, y_end)
     legends = [
-        {"message": "SON ACTIVE", "color": "BLUE", "leds": [(0, 1), (0, 2), (1, 0), (1, 1), (1, 2), (1, 3)], "y_start": 0, "text_y": -1},
-        {"message": "SON DESACTIVE", "color": "RED", "leds": [(0, 7), (0, 8), (1, 6), (1, 7), (1, 8), (1, 9)], "y_start": 6, "text_y": 5},
-        {"message": "PERTE WIFI", "color": "RED", "leds": [(0, 14), (1, 13), (1, 14), (1, 15), (2, 12), (2, 13), (2, 14), (2, 15), (2, 16)], "y_start": 12, "text_y": 11},
-        {"message": "NOM AGENCE FIXE", "color": "YELLOW", "leds": [(1, 20)], "y_start": 18, "text_y": 17},
+        {"message": "SON ON", "color": "BLUE", "leds": [(0, 3), (0, 4), (1, 2), (1, 3), (1, 4), (1, 5)], "x_offset": -2, "y_offset": -2},
+        {"message": "SON OFF", "color": "RED", "leds": [(0, 9), (0, 10), (1, 8), (1, 9), (1, 10), (1, 11)], "x_offset": -2, "y_offset": -2},
+        {"message": "NO WIFI", "color": "RED", "leds": [(0, 15), (1, 14), (1, 15), (1, 16), (2, 13), (2, 14), (2, 15), (2, 16), (2, 17)], "x_offset": -1, "y_offset": -2},
+        {"message": "NO LOOP", "color": "YELLOW", "leds": [(1, 21)], "x_offset": -2, "y_offset": -2},
     ]
 
     for legend in legends:
+        # Dessiner les LED icônes
         display.set_pen(legend["color"])
-        for x_offset, y_offset in legend["leds"]:
-            display.graphics.pixel(x_offset, y_offset)
-        display.set_pen("WHITE")
-        display.graphics.text(legend["message"], 5, legend["text_y"], -1, 1)
+        for x, y in legend["leds"]:
+            display.graphics.pixel(x, y)
+
+        # Dessiner le message en map 4 avec ajustement de position
+        draw_word_4(
+            display.graphics,
+            legend["message"],
+            5 + legend["x_offset"],  # Décalage horizontal
+            legend["leds"][0][1] + legend["y_offset"],  # Décalage vertical
+            display,
+            legend["color"]
+        )
+
     display.update()
-    time.sleep(3)
 
-    scroll_positions = [0] * len(legends)
-    last_update_times = [time.ticks_ms()] * len(legends)
-    message_widths = [display.graphics.measure_text(legend["message"], 1) for legend in legends]
-
-    # Boucle de défilement avec gestion indépendante pour chaque ligne
-    while time.time() - start_time < display_time:
-        time_ms = time.ticks_ms()
-
-        # Vérification immédiate du bouton pour basculer d'affichage
-        if display.cu.is_pressed(display.cu.SWITCH_C):
-            print("Bouton C pressé - Changement d'affichage depuis la screen légende.")
-            display.play_bip(500)
-            break  # Sortir immédiatement de la boucle
-
-        for i, legend in enumerate(legends):
-            if time_ms - last_update_times[i] > 100:
-                last_update_times[i] = time_ms
-                display.set_pen("BLACK")
-                display.graphics.rectangle(0, legend["y_start"], display.width, 5)
-                display.set_pen(legend["color"])
-                for x_offset, y_offset in legend["leds"]:
-                    display.graphics.pixel(x_offset - scroll_positions[i], y_offset)
-                display.set_pen("WHITE")
-                display.graphics.text(
-                    legend["message"],
-                    5 - scroll_positions[i],
-                    legend["text_y"],
-                    -1,
-                    1
-                )
-                if scroll_positions[i] >= message_widths[i] + display.width + 5:
-                    scroll_positions[i] = -display.width
-                    last_update_times[i] = time_ms + 3000
-                else:
-                    scroll_positions[i] += 1
-
-        display.update()
-        time.sleep(0.05)
-
+      
 # QR CODE de l'adresse Bit.ly "https://bit.ly/3AJbpj2" (https://github.com/adriens/temps-attente-matrix-led)
 led_white_positions = [
     (4, 4), (5, 4), (6, 4), (7, 4), (8, 4), (9, 4), (10, 4), (12, 4), (13, 4), (14, 4), (15, 4),
@@ -764,6 +736,7 @@ led_white_positions = [
 
 # Fonction d'affichage du QR code avec intégration de la luminosité définie dans la classe
 def display_qr_code_screen(self):
+    self.display_mode = 4
     self.clear()  # Efface l'écran pour un nouvel affichage
 
     # Affichage du QR code en tenant compte de la luminosité actuelle
@@ -820,30 +793,33 @@ def normalize_name(text):
     return ''.join(accents.get(c, c) for c in text).upper()
 
 # Fonction pour arrêter proprement le script.
-def stop_script(display, wifi_issue=False):
+def stop_script(display, wifi_issue=False, api_issue=False):
     """Arrête proprement le script et attend un redémarrage via le bouton D."""
     print("Arrêt du script demandé...")
 
-    # Affiche "NO WIFI\nREBOOT\nPRESS D" centré si l'arrêt est causé par une perte de connexion WiFi
-    message_lines = ["NO WIFI", "REBOOT", "PRESS D"] if wifi_issue else ["KO", "REBOOT", "PRESS D"]
-    display.graphics.set_pen(display.pens['BLACK'])  # Définit le fond noir
-    display.graphics.clear()  # Efface l'écran
+    # Sélection du message en fonction de la cause
+    if wifi_issue:
+        message_lines = ["NO WIFI", "REBOOT", "PRESS D"]
+    elif api_issue:
+        message_lines = ["KO API", "REBOOT", "PRESS D"]
+    else:
+        message_lines = ["KO", "REBOOT", "PRESS D"]
 
-    # Utilise draw_word_4 pour afficher le message d'arrêt sur l'écran
+    display.clear()
     display.set_pen('RED')
     y_offset = 2
     for line in message_lines:
         draw_word_4(display.graphics, line, 2, y_offset, display.pens['RED'])
-        y_offset += 10  # Augmente l'offset vertical pour chaque ligne
+        y_offset += 10
 
-    display.update()  # Met à jour l'affichage pour refléter le message final
+    display.update()
 
-    # Attente de l'appui sur le bouton D pour redémarrer
     while True:
         if display.cu.is_pressed(CosmicUnicorn.SWITCH_D):
             print("Redémarrage suite à la pression du bouton D.")
-            time.sleep(1)  # Petite pause pour éviter plusieurs déclenchements
-            machine.reset()  # Redémarrage
+            time.sleep(1)
+            machine.reset()
+        time.sleep(0.1)
 
 # Fonction pour charger les informations de connexion WiFi et clé API depuis le fichier "information.env"
 def load_credentials(file_path):
@@ -897,55 +873,110 @@ def sync_time():
     print("Échec de la synchronisation NTP.")  # Affiche un message si aucun serveur NTP n'a pu être contacté
     return False  # Retourne False si la synchronisation échoue
 
-def load_agencies(file_path):
-    """Charge les agences et leurs noms depuis le fichier agences.env."""
+
+# Fonction pour charger les agences depuis l'API
+def load_agencies_from_api(api_key):
+    """
+    Charge les agences avec ID et Nom depuis le premier endpoint.
+    Retourne un tableau structuré [ID, Nom, Temps d'attente initialisé à 0].
+    """
+    url = "https://api.opt.nc/temps-attente-agences/agences/iot"
+    headers = {"x-apikey": api_key, "Accept": "application/json"}
     agencies = []
-    file_loaded = False
+
     try:
-        with open(file_path, "r") as f:
-            for line in f:
-                if line.strip():  # Ignorer les lignes vides
-                    id, name = line.strip().split("=")
-                    agencies.append([id.strip(), name.strip().strip('"'), 0])  # Ajoute l'agence avec un temps d'attente initial de 0
-        file_loaded = True
-        print("Agences chargées depuis agences.env:", agencies)
-    except OSError:
-        print(f"Erreur : impossible de trouver ou lire le fichier {file_path}")
-    return agencies, file_loaded  # Retourne la liste des agences et le statut de chargement
+        response = requests.get(url, headers=headers, timeout=10)
+        gc.collect()  # Libérer la mémoire après la requête
 
+        if response.status_code == 200:
+            data = response.json()
+            for agency in data:
+                agency_id = agency.get("idAgence")
+                agency_name = agency.get("designation")
+                if agency_id and agency_name:
+                    agencies.append([agency_id, agency_name, 0])  # Temps initialisé à 0
+            print("Agences chargées :", agencies)
+            return agencies
+        else:
+            print(f"Erreur API : {response.status_code} - {response.text}")
+    except Exception as e:
+        print(f"Erreur lors de la récupération des agences : {e}")
+    return []
+
+# Fonction pour Initialise les temps d'attente pour les deux premières agences dans la liste
 def initialize_agency_wait_times(api_key, agencies):
-    """Initialise les temps d'attente pour les deux premières agences dans la liste."""
-    if agencies:
-        # Mettre à jour le temps d'attente pour l'agence à l'index 0
-        if not update_single_agency(api_key, agencies[0]):
-            print(f"Erreur de mise à jour du temps d'attente pour l'agence {agencies[0][1]}")
-        # Mettre à jour le temps d'attente pour l'agence à l'index 1 si elle existe
-        if len(agencies) > 1 and not update_single_agency(api_key, agencies[1]):
-            print(f"Erreur de mise à jour du temps d'attente pour l'agence {agencies[1][1]}")
-
+    """Initialise les temps d'attente pour toutes les agences."""
+    for agency in agencies:
+        if not update_single_agency(api_key, agency):
+            print(f"Erreur : Échec de l'initialisation pour l'agence {agency[1]}")
 
 # Fonction pour mettre à jour une seule agence avant l'affichage
 def update_single_agency(api_key, agency):
     """Met à jour les données d'une agence spécifique en appelant l'API."""
-    agence_id, name, old_waiting_time = agency  # Récupère les informations actuelles de l'agence
-    url = f"https://api.opt.nc/temps-attente-agences/temps-attente/agence/{agence_id}"  # Construit l'URL de l'API pour l'agence spécifique
-    headers = {"x-apikey": api_key}  # Ajoute l'API Key aux en-têtes HTTP
+    agence_id, name, old_waiting_time = agency
+    url = f"https://api.opt.nc/temps-attente-agences/agences/{agence_id}"  # URL correcte
+    headers = {"x-apikey": api_key, "Accept": "application/json"}
+    
+    # Vérification de la clé API
+    if not api_key:
+        print("Erreur : Clé API manquante.")
+        return False
+    
+    # Vérification de l'ID de l'agence
+    if not isinstance(agence_id, int):
+        print(f"Erreur : ID d'agence invalide ({agence_id}).")
+        return False
+
     try:
-        response = requests.get(url, headers=headers)  # Effectue une requête GET pour récupérer les nouvelles données de l'agence
-        gc.collect()  # Libère la mémoire immédiatement après la requête
-        print(f"Appel API pour agence {name} (ID: {agence_id}), statut: {response.status_code}")  # Affiche le statut de la réponse API
-        if response.status_code == 200:  # Si la requête réussit
-            data = response.json()  # Convertit la réponse en format JSON
-            print(f"Réponse API agence {name}: {data}")  # Affiche les nouvelles données de l'agence
-            new_waiting_time = data['realMaxWaitingTimeMs']  # Récupère le temps d'attente mis à jour
-            agency[2] = new_waiting_time  # Met à jour le temps d'attente dans la liste des agences
-            print(f"Temps d'attente mis à jour pour {name} (ID: {agence_id}) : {new_waiting_time // 60000} minutes (ancien {old_waiting_time // 60000} minutes)")
-            return True  # Retourne True si la mise à jour a réussi
+        response = requests.get(url, headers=headers, timeout=5)
+        if response.status_code == 200:
+            data = response.json()
+            new_waiting_time = data.get('realMaxWaitingTimeMs', 0)
+            agency[2] = new_waiting_time
+            print(f"Temps mis à jour pour {name} : {new_waiting_time // 60000} minutes")
+            return True
         else:
-            print(f"Erreur API pour {name} (ID: {agence_id}) : {response.status_code}")  # Affiche un message d'erreur en cas d'échec
+            print(f"Erreur API {response.status_code} pour {name} (ID: {agence_id})")
+            print(f"Message de l'API : {response.text}")
     except Exception as e:
-        print(f"Erreur lors de la mise à jour de l'agence {name} (ID: {agence_id}) : {e}")  # Affiche une erreur en cas d'exception
-    return False  # Retourne False si la mise à jour a échoué
+        print(f"Erreur réseau pour {name} (ID: {agence_id}) : {e}")
+    return False
+
+def initialize_agencies(api_key, agencies):
+    """
+    Met à jour le temps d'attente pour les agences dans le tableau.
+    """
+    for agency in agencies:
+        success = update_agency_waiting_time(api_key, agency)
+        if not success:
+            print(f"Impossible de mettre à jour {agency[1]}")
+        gc.collect()
+
+def update_agency_waiting_time(api_key, agency):
+    """
+    Met à jour le temps d'attente pour une agence spécifique.
+    agency : [ID, Nom, Temps] -> Met à jour Temps avec 'realMaxWaitingTimeMs'.
+    """
+    agency_id = agency[0]  # Récupère l'ID de l'agence
+    url = f"https://api.opt.nc/temps-attente-agences/agences/{agency_id}"
+    headers = {"x-apikey": api_key, "Accept": "application/json"}
+
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        gc.collect()  # Libérer la mémoire après la requête
+
+        if response.status_code == 200:
+            data = response.json()
+            waiting_time = data.get("realMaxWaitingTimeMs", 0)
+            agency[2] = waiting_time  # Mise à jour du temps dans le tableau
+            print(f"Temps mis à jour pour {agency[1]} : {waiting_time // 60000} minutes")
+            return True
+        else:
+            print(f"Erreur API {response.status_code} pour {agency[1]}")
+    except Exception as e:
+        print(f"Erreur lors de la mise à jour pour {agency[1]} : {e}")
+    return False
+
 
 
 # Fonction pour gérer la pression des boutons
@@ -960,94 +991,85 @@ def handle_button_press(cu, display):
     display.adjust_volume()  # Ajuste le volume avec les boutons de volume
 
 
+# Fonction qui gère la boucle dans la fonction principale main() pour l'affichage des agences
 def main_loop(display, start_time, synced, api_key, wlan, tableau_agences):
-    display.clear()  # Efface l'écran avant d'afficher le message d'attente
+    display.display_mode = 3  # Définir le mode agences
+    display.clear()
     display.display_message_frame_2("WAIT")
-    print("Début de la boucle principale - affichage initial WAIT")
+    print("Démarrage de la boucle principale - affichage initial WAIT")
     time.sleep(2)
 
-    # Initialiser la mise à jour des temps d'attente pour les deux premières agences
-    if not update_single_agency(api_key, tableau_agences[0]):
-        print("Erreur de mise à jour pour l'agence", tableau_agences[0][1])
-    if len(tableau_agences) > 1 and not update_single_agency(api_key, tableau_agences[1]):
-        print("Erreur de mise à jour pour l'agence", tableau_agences[1][1])
-
     current_index = 0
+    next_index = (current_index + 1) % len(tableau_agences)
+
+    # Mise à jour initiale uniquement pour la première agence
+    if not update_single_agency(api_key, tableau_agences[current_index]):
+        print(f"Erreur initiale de mise à jour pour {tableau_agences[current_index][1]}")
 
     while True:
         try:
-            print(f"Affichage agence - itération pour l'agence index {current_index}")
             wifi_status = display.check_wifi_status(wlan)
             display.update_led_wifi_status(wifi_status)
 
+            # Récupération des informations de l'agence
             agence_id, name, waiting_time = tableau_agences[current_index]
-
-            if update_single_agency(api_key, tableau_agences[current_index]):
-                print(f"Agence mise à jour : {name}, Temps d'attente mis à jour.")
-            else:
-                print(f"Affichage des anciennes données pour : {name}")
-
             mood = 'happy' if waiting_time < 300000 else 'neutral' if waiting_time < 600000 else 'sad'
+
+            # Affichage des informations
             display.clear()
-            display.draw_frame(0, 6, 'YELLOW')
-            display.draw_text_opt()
+            #display.draw_frame(0, 6, 'YELLOW')
+            display.draw_text_opt()  # Sigle OPT
             display.draw_smiley(mood)
             display.set_transition_variable(name)
+            display.update_led_sound_status()
+            print(f"Agence : {name}, Temps d'attente : {waiting_time // 60000} min")
 
-            print(f"Agence affichée : {name}, ID : {agence_id}, Temps d'attente : {waiting_time // 60000} minutes")
+            # Gestion des boutons A, B, C, D
+            for _ in range(100):
+                if display.cu.is_pressed(display.cu.SWITCH_A):
+                    display.toggle_sound()
 
-            iteration_count = 0
-            while iteration_count < 100:
-                if display.cu.is_pressed(CosmicUnicorn.SWITCH_C):
-                    print("Bouton C pressé - Retour à l'écran d'accueil.")
-                    display.play_bip(500)
-                    time.sleep(0.5)
+                if display.cu.is_pressed(display.cu.SWITCH_B):
+                    display.toggle_loop_pause()
+
+                if display.cu.is_pressed(display.cu.SWITCH_C):
+                    print("Bouton C pressé - Changement d'écran.")
                     return
 
-                if display.cu.is_pressed(CosmicUnicorn.SWITCH_B):
-                    display.toggle_loop_pause()
+                if display.cu.is_pressed(display.cu.SWITCH_D):
+                    print("Bouton D pressé - Reboot de la matrice.")
                     time.sleep(0.5)
+                    machine.reset()
 
-                if display.loop_paused:
+                if not display.loop_paused:
                     display.scroll_text(display.transition_var)
                     display.display_clock(start_time, synced)
-                    display.adjust_brightness()
-                    display.adjust_volume()
-                    handle_button_press(display.cu, display)
-                    time.sleep(0.1)
-                    continue
 
-                display.scroll_text(display.transition_var)
-                display.display_clock(start_time, synced)
                 display.adjust_brightness()
                 display.adjust_volume()
-                handle_button_press(display.cu, display)
                 time.sleep(0.1)
-                iteration_count += 1
 
-            next_index = (current_index + 1) % len(tableau_agences)
+            # Mise à jour de l'agence suivante
             if not update_single_agency(api_key, tableau_agences[next_index]):
-                print("Erreur de mise à jour pour l'agence", tableau_agences[next_index][1])
+                print(f"Échec de mise à jour pour {tableau_agences[next_index][1]}")
 
-            if not display.loop_paused:
-                current_index = next_index
+            current_index = next_index
+            next_index = (current_index + 1) % len(tableau_agences)
 
         except Exception as e:
-            print(f"Erreur dans la boucle d'affichage des agences : {e}")
+            print(f"Erreur dans la boucle : {e}")
             time.sleep(2)
-        display.update_led_sound_status(False)
 
-# Fonction main pour afficher la page d'accueil avec le message "UNC OPT".
+
+# Fonction main pour accéder aux différents affichages
 def main():
-    """Fonction principale avec affichage initial et basculement vers l'écran d'accueil."""
-    display = CosmicUnicornDisplay()  # Initialise l'affichage
+    """Fonction principale avec initialisation, gestion des écrans et affichage des agences."""
+    display = CosmicUnicornDisplay()
     cu = display.cu  # Gestion des boutons
 
-    # Affichage de l'écran "WAIT" au démarrage
-    step = 0
-    show_loading_screen(display, step)
+    # Étape 1 : Affichage "WAIT" initial
+    show_loading_screen(display, 0)
     print("Affichage initial 'WAIT'")
-    step += 1
 
     # Charger les informations WiFi et API
     credentials = load_credentials("information.env")
@@ -1056,63 +1078,73 @@ def main():
         stop_script(display)
         return
 
-    wlan = connect_wifi(credentials['SSID'], credentials['WIFI_PASSWORD'], display)
-    if wlan is None:
-        print("Erreur de connexion WiFi. Arrêt du script.")
-        stop_script(display, wifi_issue=True)
-        return
-
-    show_loading_screen(display, step)
-    step += 1
-    tableau_agences, file_agences_status = load_agencies("agences.env")
-    if not file_agences_status:
-        print("Erreur : Impossible de charger les agences.")
+    api_key = credentials.get('API_KEY')
+    if not api_key:
+        print("Erreur : Clé API manquante.")
         stop_script(display)
         return
 
-    show_loading_screen(display, step)
-    step += 1
-
-    if wlan:
-        synced = sync_time()
-        start_time = time.time()
-        wifi_status = True
-    else:
+    wlan = connect_wifi(credentials['SSID'], credentials['WIFI_PASSWORD'], display)
+    if not wlan:
         stop_script(display, wifi_issue=True)
         return
 
-    show_loading_screen(display, step)
-    step += 1
+    show_loading_screen(display, 1)
 
-    api_key_status = credentials.get('API_KEY') is not None
-    initialize_agency_wait_times(credentials['API_KEY'], tableau_agences)
+    # Synchronisation NTP
+    if not sync_time():
+        print("Échec de la synchronisation NTP.")
+    else:
+        print("Synchronisation NTP réussie.")
+    display.update_led_wifi_status(wlan.isconnected())
 
-    show_loading_screen(display, step)
-    print("Chargement terminé.")
-    step += 1
+    # Charger les agences via le premier endpoint
+    tableau_agences = load_agencies_from_api(api_key)
+    if not tableau_agences:
+        print("Erreur : Impossible de charger les agences.")
+        stop_script(display, api_issue=True)
+        return
+    print(f"{len(tableau_agences)} agences chargées avec succès.")
 
-    # Modes d'affichage et configuration
+    # Mise à jour uniquement de la première agence
+    if not update_single_agency(api_key, tableau_agences[0]):
+        print(f"Erreur : Échec de mise à jour initiale pour {tableau_agences[0][1]}.")
+
+    show_loading_screen(display, 2)
+
+    # Synchronisation de l'heure
+    synced = sync_time() if wlan else False
+    start_time = time.time()
+
+    # Initialisation des LEDs pour le son
+    display.update_led_sound_status()
+
+    # Configuration des modes d'affichage
     display_modes = [
-        display_welcome_screen,
-        lambda d: display_info_screen(d, wifi_status, api_key_status, file_agences_status),
-        lambda d: display_legend_screen(d, display_time=15),
-        lambda d: main_loop(d, start_time, synced, credentials['API_KEY'], wlan, tableau_agences),
-        display_qr_code_screen
+        display_welcome_screen,  # Écran d'accueil UNC/OPT
+        lambda d: display_info_screen(d, wlan.isconnected(), True, True),  # Statut API/WiFi/ENV
+        lambda d: display_legend_screen(d),  # Légendes des LEDs
+        lambda d: main_loop(d, start_time, synced, api_key, wlan, tableau_agences),  # Affichage des agences
+        lambda d: display_qr_code_screen(d)  # Écran QR Code Bit.ly
     ]
-    current_mode = 0
 
-    # Forcer le passage initial au premier écran après le chargement
-    display.display_mode = current_mode
+    current_mode = 0
     display_modes[current_mode](display)
 
+    # Boucle principale pour gérer les changements d'écran avec le bouton C
     while True:
         handle_button_press(cu, display)
 
+        # Bouton A : Activation/désactivation du son
+        if cu.is_pressed(cu.SWITCH_A):
+            display.toggle_sound()  # Change l'état du son et met à jour les LEDs
+            time.sleep(0.5)
+
+        # Bouton C : Basculer vers l'écran suivant
         if cu.is_pressed(CosmicUnicorn.SWITCH_C):
             current_mode = (current_mode + 1) % len(display_modes)
-            display.display_mode = current_mode
             display.play_bip(500)
-            print("Passage au mode suivant.")
+            print("Passage à l'écran suivant.")
             time.sleep(0.5)
             display_modes[current_mode](display)
 
@@ -1121,5 +1153,9 @@ def main():
 
 # Démarrer le programme avec la fonction main()
 main()
+
+
+
+
 
 
