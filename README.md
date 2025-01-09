@@ -8,8 +8,15 @@ sur des problématiques en lien avec le monde de l'entreprise.
 
 - **👨‍🦲 LEAD Dev** : [Raphael Bordais](https://www.linkedin.com/in/rapha%C3%ABl-bordais/)
 - **👨 Dev** : Jose Goue
-- **👱‍♀️ Senior Dev** : [Michèle Barré](https://github.com/mbarre/)
-- 👨 PO : [Adrien](https://dev.to/adriens)
+- **🧑‍🤝‍🧑 API Backend Dev** : [Michèle Barré](https://github.com/mbarre/) & [Vinh Faucher](https://github.com/Supervinh)
+- 👨 PO : [Adrien Sales](https://dev.to/adriens)
+
+# 📑 Ressources produites
+
+- [👾 UX : From API to IoT LED Matrix show](https://dev.to/adriens/ux-from-api-to-iot-led-matrix-show-239g)
+- [🎦 Les Temps d'attente OPT-NC sur une matrice LED!](https://youtu.be/8HhTMX7WSeQ)
+- [🪛 Article Hackster.io : Post-Office Wait Time API-driven waiting time LED Matrix](https://www.hackster.io/adriensales/post-office-wait-time-api-driven-waiting-time-led-matrix-39c00b)
+- [🗨️ Support de présentation](https://bit.ly/40c4Cs1)
 
 # 📑 Documentations de la matrix
 
