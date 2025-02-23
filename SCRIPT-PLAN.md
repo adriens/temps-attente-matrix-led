@@ -1,4 +1,4 @@
-%% Forcer un thème clair (fond blanc) si nécessaire :
+```mermaid
 %%{init: {'theme':'neutral', 'themeVariables': {'background':'#ffffff'}}}%%
 
 flowchart TB
@@ -72,3 +72,4 @@ class R1 red
 
 E1 --> R1
 R1 -.-> D1
+```
