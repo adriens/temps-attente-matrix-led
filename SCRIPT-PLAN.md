@@ -25,7 +25,7 @@ flowchart TB
  subgraph S3["Phase agences"]
     direction TB
         A2("API 2")
-        A1("Agences n")
+        A1(" Affichage Agence n")
         A3("MaJ tps")
         A5("n+1=>n")
         A4("Old tps")
