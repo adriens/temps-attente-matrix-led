@@ -18,8 +18,8 @@ flowchart TB
         SC2("Screen Info")
         SC1("Screen Accueil")
         SC3("Screen Légende")
-        SC4("Screen Agences")
         SC5("Screen QR Code")
+        SC4("Screen Agences")
   end
  subgraph s3["Phase agences"]
         A1("Agences n")
