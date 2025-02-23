@@ -1,65 +1,73 @@
 ```mermaid
 flowchart TD
 
-    %% Script de démarrage
-    Start[Démarrage matrice LED<br>Lancement du script] --> Wifi_Check{Connexion<br>WIFI}
+%% Optionnel : initialisation d'un thème clair (pour forcer le fond blanc)
+%%{init: {'theme':'neutral', 'themeVariables': {'background':'#ffffff'}}}%%
 
-    %% Forme doc en jaune
-    doc["Fichier .env"]:::yellow --> |Récupération ID| Wifi_Check
-    doc --> |Récupération clé| ApiKey_Check
+flowchart TB
 
-    %% Formes en vert
-    classDef green fill:#c2e59c,stroke:#2e7d32,stroke-width:2px;
-    Wifi_Check:::green
-    NTP_Check{Synchronisation<br>NTP / GMT+11}:::green
-    ApiKey_Check{Requête<br>API 1}:::green
-    API2_Check{Requête<br>API 2}:::green
-    ButtonB{Bouton B}:::green
+%% Définition des classes de couleurs
+classDef green fill:#E3FCEC,stroke:#2e7d32,stroke-width:2px,color:#000
+classDef orange fill:#FFEACC,stroke:#f59e0b,stroke-width:2px,color:#000
+classDef pink fill:#FFD9E8,stroke:#DB2777,stroke-width:2px,color:#000
+classDef red fill:#f8b4b4,stroke:#e53935,stroke-width:2px,color:#000
 
-    Wifi_Check -->|KO| Exit_Wifi[Affichage<br>NO WIFI<br>=> Sortie script]
-    Wifi_Check -->|OK| NTP_Check
+%% Sous-graphe 1 : Phase de démarrage
+subgraph S1[Phase de démarrage]
+direction TB
+    SM1(Démarrage matrice)
+    SM2(Chargement .env)
+    SM3(Connexion WiFi)
+    SM4(Synchronisation NTP)
 
-    NTP_Check -->|KO| Exit_NTP[Affichage<br>NO NTP<br>=> Sortie script]
-    NTP_Check -->|OK| ApiKey_Check
+    SM1 --> SM2
+    SM2 --> SM3
+    SM3 --> SM4
+end
+class S1 green
 
-    ApiKey_Check -->|KO| Exit_ApiKey[Affichage<br>NO API<br>=> Sortie script]
-    ApiKey_Check -->|OK| Dico[Dictionnaire<br>agences]
+%% Sous-graphe 2 : Écrans principaux
+subgraph S2[Écrans Principaux]
+direction TB
+    SA(Screen Accueil)
+    SI(Screen Info)
+    SL(Screen Légende)
+    SG(Screen Agences)
+    SQ(Screen QR Code)
 
-    Dico --> API2_Check
+    SA --> SI
+    SI --> SL
+    SL --> SG
+    SG --> SQ
+end
+class S2 orange
 
-    Exit_Wifi --> Reboot[Vérifier config<br>Redémarrer matrice]
-    Exit_ApiKey --> Reboot
-    Exit_NTP --> Reboot
+%% Sous-graphe 3 : Gestion des Agences
+subgraph S3[Gestion des Agences]
+direction TB
+    A1(Agences n)
+    A2(Ancien Temps)
+    A3(Appel API2)
+    A4(Mise à jour du Temps)
+    A5(Affichage)
 
-    API2_Check -->|KO| ContinueNoUpdate[Sans mise à jour<br>Temps d'attente]
-    API2_Check -->|OK| ContinueUpdate[Avec mise à jour<br>Temps d'attente]
+    A1 --> A2
+    A2 --> A3
+    A3 --> A4
+    A4 --> A5
+end
+class S3 pink
 
-    ContinueUpdate --> Affichage[Mise en place<br>affichage agence]
-    ContinueNoUpdate --> Affichage
+%% Liens entre les sous-graphes
+S1 --> S2
+S2 --> S3
 
-    %% Alignement horizontal des smileys et du bloc Stop
-    Affichage -->|< 5 min| Happy[Affichage<br>Smiley Happy] 
-    Affichage -->|5 à 10 min| Neutral[Affichage<br>Smiley Neutre] 
-    Affichage -->|> 10 min| Sad[Affichage<br>Smiley Sad]
-    Affichage <--> Stop[Pas d'incrément<br>de l'index]
+%% Gestion des erreurs et sorties
+E1(Erreur script<br>Sortie)
+class E1 red
 
-    Happy --> ButtonB
-    Neutral --> ButtonB
-    Sad --> ButtonB
-    Stop <--> ButtonB
-
-    ButtonB -->|inactif| Next[Incrément de l'index +1]
-    Next --> API2_Check
-
-    Scroll[Défilement<br>Nom d'agence] --> Affichage
-    Clock[Affichage<br>Heure GMT+11] --> Affichage
-
-    %% Formes rouges
-    classDef red fill:#f8b4b4,stroke:#e53935,stroke-width:2px;
-    Exit_Wifi:::red
-    Exit_ApiKey:::red
-    Exit_NTP:::red
-    Reboot:::red
-
-    %% Forme jaune
-    classDef yellow fill:#fef08a,stroke:#f59e0b,stroke-width:2px;
+SM2 -- "Pas d'accès .env" --> E1
+SM3 -- "10 tentatives KO" --> E1
+SM4 -- "KO" --> E1
+A3 -- "KO" --> E1
+A4 -- "8 tentatives" --> E1
