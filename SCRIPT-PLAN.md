@@ -16,17 +16,20 @@ direction TB
     D2(Chargement .env)
     D3(Connexion WiFi)
     D4(Synchro NTP)
+    D5(API 1)
     
     D1 --> D2
     D2 --> D3
     D3 --> D4
+    D4 --> D5
 end
 class S1 green
 
 %% Liaisons d'erreur possibles
 D2 -- "Pas d'accès fichier .env" --> E1(Erreur script<br>Sortie)
 D3 -- "10 tentatives WiFi KO" --> E1
-D4 -- "KO" --> E1
+D4 -- "Echec NTP sur 3 URL" --> E1
+D5 -- "Erreur API" --> E1
 
 %% --- 2) Sous-graphe des écrans principaux ---
 subgraph S2[Écrans Principaux]
@@ -37,10 +40,12 @@ direction TB
     SC4(Screen Agences)
     SC5(Screen QR Code)
     
+    D5  --> SC1
     SC1 --> SC2
     SC2 --> SC3
     SC3 --> SC4
     SC4 --> SC5
+    SC5 --> SC1
 end
 class S2 orange
 
@@ -48,19 +53,25 @@ class S2 orange
 subgraph S3[Agences]
 direction TB
     A1(Agences n)
-    A2(Old tps)
-    A3(API 2)
-    A4(Maj tps)
-    
+    A2(API 2)
+    A3(MaJ tps)
+    A4(Old tps)
+    A5(n+1=>n)
+    A6(n+1=>n)
+
+    SC4 --> A1
     A1 --> A2
     A2 --> A3
-    A3 --> A4
+    A3 --> A5
+    A5 --> A1
 end
 class S3 pink
 
 %% Erreurs lors de l'appel ou de la mise à jour
-A3 -- "KO" --> E1
-A4 -- "8 tentatives" --> E1
+A2 -- "KO MaJ tps" --> A4 
+A4 --"Reprise old tps" --> A6 
+A6 -- "continuité boucle" --> A1 
+A2 -- "5 tentatives KO" --> E1
 
 %% Noeud d'erreur global
 E1(Erreur script sortie)
