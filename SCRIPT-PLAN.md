@@ -43,7 +43,8 @@ flowchart TB
     SC3 -- "Bouton C" --> SC4
     SC4 -- "Bouton C" --> SC5
     SC4 -- "Rester sur cet affichage" --> A2
-    SC5 -- "Bouton C" --> SC1 & A2
+    SC5 -- "Bouton C" --> SC1
+    SC5 --> A2
     A1 --> A2
     A2 --> A3
     A3 --> A5
