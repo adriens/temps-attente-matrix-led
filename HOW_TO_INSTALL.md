@@ -31,15 +31,13 @@ Clone the repository to your local machine:
 Navigate to the project directory
   cd temps-attente-matrix-led
 
-# 3. Configure WiFi Credentials
+# 3. Configure WiFi Credentials and API Key
 
 **Edit the .env file** to provide your **WiFi credentials** :
 SSID=<your-SSID>
 WIFI_PASSWORD=<your-password>
 
-# 5. Configure API Key
-
-**Open the .env** file and add your API key in the format :
+Add your **API key** in the format :
   API_KEY=<your-api-key>
 
 # 4. Copy Files to Raspberry Pi Pico
@@ -73,11 +71,13 @@ Use Thonny IDE to overwrite the old script on the Pico's filesystem.
 * **Volume**: Use the buttons on the Cosmic Unicorn to adjust the sound volume during runtime.
 * **Brightness**: Adjust the brightness using the appropriate buttons on the Cosmic Unicorn.
 
-# 10. Button A and B Functionality
-
-* **Button A**: Toggles the sound on and off. When the sound is enabled, a beep will play to indicate activation.
-* **Button B**: Pauses or resumes the main display loop. When paused, a yellow LED will indicate the pause status.
+# 10. Button Functionalities
+* ***Button A "SOUND"**: Toggles the sound of the LED matrix on and off.
+*-* **Button B "LOOP"**: During the agency display, if you wish to remain on the currently shown agency, pressing this button locks the display loop to prevent automatic changes.
+*-* **Button C "DISPLAY"**: During the display phase, pressing this button cycles through the different screens (Home, Information, Legend, Agencies, QR_Code).
+*-* **Button D "RESTART"**: Restarts the LED matrix.
+*-* **Volume +/- Buttons**: Adjust the sound intensity of the LED matrix.
+*-* **Brightness +/- Buttons**: Adjust the brightness of the LED matrix.
 
 # Additional Notes
-
 Feedback and Contributions: If you'd like to contribute or provide feedback on this guide, please open an issue or submit a pull request on GitHub.
