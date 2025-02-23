@@ -1,3 +1,4 @@
+```mermaid
 flowchart TD
 
     %% Script de démarrage
