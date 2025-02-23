@@ -73,11 +73,11 @@ Use Thonny IDE to overwrite the old script on the Pico's filesystem.
 
 # 10. Button Functionalities
 * ***Button A "SOUND"**: Toggles the sound of the LED matrix on and off.
-*-* **Button B "LOOP"**: During the agency display, if you wish to remain on the currently shown agency, pressing this button locks the display loop to prevent automatic changes.
-*-* **Button C "DISPLAY"**: During the display phase, pressing this button cycles through the different screens (Home, Information, Legend, Agencies, QR_Code).
-*-* **Button D "RESTART"**: Restarts the LED matrix.
-*-* **Volume +/- Buttons**: Adjust the sound intensity of the LED matrix.
-*-* **Brightness +/- Buttons**: Adjust the brightness of the LED matrix.
+* **Button B "LOOP"**: During the agency display, if you wish to remain on the currently shown agency, pressing this button locks the display loop to prevent automatic changes.
+* **Button C "DISPLAY"**: During the display phase, pressing this button cycles through the different screens (Home, Information, Legend, Agencies, QR_Code).
+* **Button D "RESTART"**: Restarts the LED matrix.
+* **Volume +/- Buttons**: Adjust the sound intensity of the LED matrix.
+* **Brightness +/- Buttons**: Adjust the brightness of the LED matrix.
 
 # Additional Notes
 Feedback and Contributions: If you'd like to contribute or provide feedback on this guide, please open an issue or submit a pull request on GitHub.
