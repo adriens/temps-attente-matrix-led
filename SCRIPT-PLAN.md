@@ -1,12 +1,8 @@
 ```mermaid
----
-config:
-  theme: neutral
-  themeVariables:
-    background: '#ffffff'
-  layout: fixed
----
+%%{init: {'theme':'neutral','themeVariables':{'background':'#ffffff'}, 'layout':'fixed'}}%%
 flowchart TB
+  ...
+
  subgraph s1["Phase démarrage"]
         D2("Chargement .env")
         D1("Démarrage matrice")
