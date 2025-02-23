@@ -72,7 +72,7 @@ Use Thonny IDE to overwrite the old script on the Pico's filesystem.
 * **Brightness**: Adjust the brightness using the appropriate buttons on the Cosmic Unicorn.
 
 # 10. Button Functionalities
-* ***Button A "SOUND"**: Toggles the sound of the LED matrix on and off.
+* **Button A "SOUND"**: Toggles the sound of the LED matrix on and off.
 * **Button B "LOOP"**: During the agency display, if you wish to remain on the currently shown agency, pressing this button locks the display loop to prevent automatic changes.
 * **Button C "DISPLAY"**: During the display phase, pressing this button cycles through the different screens (Home, Information, Legend, Agencies, QR_Code).
 * **Button D "RESTART"**: Restarts the LED matrix.
