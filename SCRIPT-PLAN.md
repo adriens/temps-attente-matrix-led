@@ -49,7 +49,7 @@ flowchart TB
     A3 --> A5
     A5 --> A1
     A2 -- KO MaJ tps --> A4
-    A4 -- Reprise old tps --> A6("n+1=>n")
+    A4 -- Reprise old tps --> A6
     A6 -- continuité boucle --> A1
     A2 -. 5 tentatives KO .-> E2("Erreur script 2")
     E1 --> R1("Redémarrage matrice")
@@ -63,9 +63,9 @@ flowchart TB
     classDef green fill:#E3FCEC, stroke:#2e7d32, stroke-width:2px, color:#000
     classDef red fill:#f8b4b4, stroke:#e53935, stroke-width:2px, color:#000
     style E2 stroke:#D50000
-    style s1 fill:#E0FFE0,stroke:#00C853,stroke-width:2px;
-    style s2 fill:#FFFFE0,stroke:#FFD600,stroke-width:2px;
-    style s3 fill:#E0F7FF,stroke:#2962FF,stroke-width:2px;
+    style s1 fill:#E0FFE0,stroke:#00C853,stroke-width:2px
+    style s2 fill:#FFFFE0,stroke:#FFD600,stroke-width:2px
+    style s3 fill:#E0F7FF,stroke:#2962FF,stroke-width:2px
     linkStyle 4 stroke:#D50000,fill:none
     linkStyle 5 stroke:#D50000,fill:none
     linkStyle 6 stroke:#D50000,fill:none
