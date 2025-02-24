@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projet Master MIAGE/OPT 2025</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.4.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.4.0/dist/theme/black.css">
+    <link rel="stylesheet" href="css/style_perso.css">
+    <style>
+        .reveal .slide-number {
+            left: 10px !important;
+            right: auto !important;
+            bottom: 10px !important;
+            font-size: 1.5rem;
+            color: white;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .reveal .progress {
+            height: 5px;
+            bottom: 0;
+        }
+
+        #time-progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background-color: #ddd;
+            z-index: 1000;
+        }
+
+            #time-progress-bar div {
+                width: 0;
+                height: 100%;
+                background-color: #4CAF50;
+                transition: width 0.1s linear;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="reveal">
+
+        <div class="slides">
+
+            <!----------------------------------------------------------------- Section du Titre principal ----------------------------------------------------------------->
+            <section data-background-transition="fade" data-transition="zoom" style="position: relative; overflow: hidden;">
+
+                <div style="text-align: center; animation: fadeIn 2s;">
+                    <h1 style="font-size: 3.5rem; margin: 0;">SOLUTION IoT DATAVIZ OPT</h1>
+                    <h1 style="font-size: 3.5rem; margin: 10px 0;">API TEMPS ATTENTE + MATRICE LED</h1>
+                </div>
+
+                <!-- Logos avec rotation aléatoire contrôlée -->
+                <div style="display: flex; justify-content: center; align-items: center; gap: 30px; margin-top: 50px; position: relative; height: 100px;">
+                    <!-- Case 1 avec sa liste -->
+                    <div style="width: 100px; height: 100px; overflow: hidden; position: relative;">
+                        <div id="slot1" style="display: flex; flex-direction: column; transition: transform 3s ease-in-out;"></div>
+                    </div>
+                    <!-- Case 2 avec sa liste -->
+                    <div style="width: 100px; height: 100px; overflow: hidden; position: relative;">
+                        <div id="slot2" style="display: flex; flex-direction: column; transition: transform 3s ease-in-out;"></div>
+                    </div>
+                    <!-- Case 3 avec sa liste -->
+                    <div style="width: 100px; height: 100px; overflow: hidden; position: relative;">
+                        <div id="slot3" style="display: flex; flex-direction: column; transition: transform 3s ease-in-out;"></div>
+                    </div>
+                </div>
+
+                <!-- Sous-titre -->
+                <div style="text-align: center; margin-top: 30px; animation: fadeIn 4s;">
+                    <h2 style="font-size: 2.5rem;">MIAGE M2 - 2024/2025</h2>
+                </div>
+
+                <!-- Script pour gérer l'animation et les logos aléatoires -->
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const logoList = [
+                            { src: './photo/unc.jpeg', alt: 'Logo UNC' },
+                            { src: './photo/opt.jpeg', alt: 'Logo OPT' },
+                            { src: './photo/iae.jpg', alt: 'Logo IAE' }
+                        ];
+
+                        const slots = [
+                            document.getElementById('slot1'),
+                            document.getElementById('slot2'),
+                            document.getElementById('slot3')
+                        ];
+
+                        let previousStopIndices = [-1, -1, -1];
+
+                        function shuffleLogos() {
+                            return logoList.sort(() => Math.random() - 0.5);
+                        }
+
+                        function ensureUniqueStops() {
+                            const stops = new Set();
+                            const stopIndices = [];
+
+                            while (stops.size < slots.length) {
+                                let randomIndex;
+                                do {
+                                    randomIndex = Math.floor(Math.random() * logoList.length);
+                                } while (stops.has(randomIndex));
+
+                                stops.add(randomIndex);
+                                stopIndices.push(randomIndex);
+                            }
+
+                            return stopIndices;
+                        }
+
+                        function populateSlots() {
+                            slots.forEach((slot) => {
+                                slot.innerHTML = '';
+                                logoList.forEach((logo) => {
+                                    const img = document.createElement('img');
+                                    img.src = logo.src;
+                                    img.alt = logo.alt;
+                                    img.style.width = '100px';
+                                    img.style.height = 'auto';
+                                    slot.appendChild(img);
+                                });
+                            });
+                        }
+
+                        function startAnimation() {
+                            const stopIndices = ensureUniqueStops();
+
+                            slots.forEach((slot, index) => {
+                                const totalHeight = slot.scrollHeight;
+                                const itemHeight = totalHeight / slot.children.length;
+
+                                // Position de fin unique
+                                const stopPosition = -(itemHeight * stopIndices[index]);
+
+                                // Commence à la position précédente (si existe) ou zéro
+                                const startPosition = previousStopIndices[index] !== -1
+                                    ? -(itemHeight * previousStopIndices[index])
+                                    : 0;
+
+                                // Réinitialiser à la position de départ
+                                slot.style.transition = 'none';
+                                slot.style.transform = `translateY(${startPosition}px)`;
+
+                                // Animer vers la nouvelle position
+                                setTimeout(() => {
+                                    slot.style.transition = 'transform 3s ease-in-out';
+                                    slot.style.transform = `translateY(${stopPosition}px)`;
+                                }, 50);
+
+                                // Mettre à jour la position précédente
+                                previousStopIndices[index] = stopIndices[index];
+                            });
+                        }
+
+                        // Initialisation
+                        populateSlots();
+
+                        // Lancer l'animation toutes les 5 secondes
+                        setInterval(() => {
+                            startAnimation();
+                        }, 5000);
+
+                        // Démarrer l'animation initiale
+                        startAnimation();
+                    });
+                </script>
+            </section>
+
+
+            <!----------------------------------------------------------------- Section de présentation du projet  ----------------------------------------------------------------->
+            <section>
+
+                <!-- Section de présentation de l'équipe' -->
+                <section data-autoappear=''>
+                    <h1>Equipe</h1>
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 50px;">
+                        <div style="text-align: center;">
+                            <img src="./photo/jose.png" alt="José" width="150">
+                            <h3>José Goué</h3>
+                            <h6>CHT - Ingénieur logiciel</h6>
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="./photo/raphael.png" alt="Raphaël" width="150">
+                            <h3>Raphaël Bordais</h3>
+                            <h6>CCI - Architecte sys/rés</h6>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- Section du pitch -->
+                <section data-autoappear='{"h3": {"animation": "animate__fadeInDown", "speed": "fast", "delay": 50, "split": "words", "container-delay": 50}}'>
+                    <h1>Projet</h1>
+                    <h3>Expérience DEV</h3>
+                    <h3>Projet DATAVIZ</h3>
+                    <aside class="notes">
+                        UNC challenge ses étudiants sur projets tutorés
+                        => expérience dev sur des problématiques d'entreprise
+                        OPT projet dataviz drivée par les données de temps d'attente de l'OPT-NC
+                        => livrer simple, efficace et artitique un device indiquant le niveau d'attente d'une agence.
+                    </aside>
+                </section>
+
+                <!-- Section du comment ? -->
+                <section data-autoappear='{"h3": {"animation": "animate__fadeInDown", "speed": "fast", "delay": 50, "split": "words", "container-delay": 50}}'>
+                    <h1>Comment?</h1>
+                    <h3>Utilisation capacités matrice LED</h3>
+                    <aside class="notes">
+                        Notes de la section comment
+                    </aside>
+                </section>
+
+                <!-- Section du pourquoi ? -->
+                <section data-autoappear='{"h3": {"animation": "animate__fadeInDown", "speed": "fast", "delay": 50, "split": "words", "container-delay": 50}}'>
+                    <h1>Pourquoi?</h1>
+                    <h3>Affichage "temps d'attente en agence"</h3>
+                    <h3>Démonstration polyvalence matrice LED</h3>
+                    <aside class="notes">
+                        Notes de la section
+                    </aside>
+                </section>
+
+                <!-- Section des enjeux -->
+                <section data-autoappear='{"h3": {"animation": "animate__fadeInDown", "speed": "fast", "delay": 50, "split": "words", "container-delay": 50}}'>
+                    <h1>Plan</h1>
+                    <ul style="list-style: none; padding: 0; font-size: 1em; line-height: 1.2; text-align: left;">
+                        <li>Matériel</li>
+                        <li>APIGEE</li>
+                        <li>Script</li>
+                        <li>Affichages</li>
+                        <li>Que retenir?</li>
+                        <li>Sources</li>
+                    </ul>
+                    <aside class="notes">
+                        Notes de la section
+                    </aside>
+                </section>
+
+            </section>
+
+            <!---------------------------------------------------------------- Section de présentation du matériel ---------------------------------------------------------------->
+            <section>
+
+                <!-- Section matériels -->
+                <section data-autoappear='{"h2": {"animation": "animate__fadeInDown", "speed": "fast", "delay": 50, "split": "words", "container-delay": 50}}'>
+                    <h1>Matériel</h1>
+                </section>
+
+
+                <!-- Section matériels/pimo face avant -->
+                <section data-transition="convex" data-autoappear='{}'>
+                    <h3 style="margin-bottom: 10px;">Pimoroni Cosmic-Unicorn</h3>
+                    <div style="display: flex; justify-content: center; align-items: center; margin-top: 10px; width: 90%;">
+                        <img src="./photo/Pimoroni_front.png" alt="Script_principe"
+                             style="width: 55vw; max-width: 50%; height: auto;">
+                        <div style="text-align: left; width: 35vw;">
+                            <ul style="list-style: none; padding: 0; font-size: 1em; line-height: 1.3; text-align: left;">
+                                <li>Face avant</li>
+                                <li>1024 LEDs RGB</li>
+                                <li>Grille 32x32</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <aside class="notes">
+                        Notes de la section
+                    </aside>
+                </section>
+
+                <!-- Section matériels/pimo face arrière -->
+                <section data-transition="convex" data-autoappear='{}'>
+                    <h3 style="margin-bottom: 10px;">Pimoroni Cosmic-Unicorn</h3>
+                    <div style="display: flex; justify-content: center; align-items: center; margin-top: 10px; width: 90%;">
+                        <img src="./photo/Pimoroni_back.png" alt="Script_principe"
+                             style="width: 55vw; max-width: 50%; height: auto;">
+                        <div style="text-align: left; width: 35vw;">
+                            <ul style="list-style: none; padding: 0; font-size: 1em; line-height: 1.3; text-align: left;">
+                                <li>Face arrière</li>
+                                <li>Alim/Prog USB</li>
+                                <li>9 boutons (8 prog)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <aside class="notes">
+                        Notes de la section
+                    </aside>
+                </section>
+
+                <!-- Section matériels/rasp -->
+                <section data-transition="convex" data-autoappear='{}'>
+                    <h3 style="margin-bottom: 10px;">Raspberry Pi PicoW intégré</h3>
+                    <div style="display: flex; justify-content: center; align-items: center; margin-top: 10px; width: 90%;">
+                        <img src="./photo/Pimoroni_rasb_picoW.png" alt="Script_principe"
+                             style="width: 55vw; max-width: 50%; height: auto;">
+                        <div style="text-align: left; width: 35vw;">
+                            <ul style="list-style: none; padding: 0; font-size: 1em; line-height: 1.3; text-align: left;">
+                                <li>Processeur Dual Arm</li>
+                                <li>Memoire 2 Mo flash</li>
+                                <li>Wifi 2.4G</li>
+                                <li>C/C++ & MicroPython</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <aside class="notes">
+                        Notes de la section
+                    </aside>
+                </section>
+
+                <!-- Section matériels/soft -->
+                <section data-transition="convex" data-autoappear='{}'>
+                    <h3 style="margin-bottom: 10px;">Stack Logiciel</h3>
+                    <div style="display: flex; justify-content: center; align-items: center; margin-top: 10px; width: 90%;">
+                        <img src="./photo/stack_log.png" alt="Script_principe"
+                             style="width: 55vw; max-width: 50%; height: auto;">
+                        <div style="text-align: left; width: 35vw;">
+                            <ul style="list-style: none; padding: 0; font-size: 1em; line-height: 1.3; text-align: left;">
+                                <li>Matrice LED</li>
+                                <li>MycroPython</li>
+                                <li>Thonny</li>
+                                <li>USB/REPL</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <aside class="notes">
+                        Notes de la section
+                    </aside>
+                </section>
+
+                <!-- Section matériels/soft -->
+                <section data-transition="convex" data-autoappear='{}'>
+                    <h3 style="margin-bottom: 10px;">Thonny</h3>
+
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 30px; margin-top: 10px; width: 90%;">
+                        <div style="text-align: center;">
+                            <img src="./photo/uf2.png" alt="Install/upgrade/hard-reset"
+                                 style="width: 40vw; max-width: 400px; height: auto;">
+                            <h5>Install/upgrade/hard-reset</h5>
+                        </div>
+
+                        <div style="text-align: center;">
+                            <img src="./photo/Thonny.png" alt="Gestion/test/téléversement"
+                                 style="width: 40vw; max-width: 400px; height: auto;">
+                            <h5>Gestion/test/téléversement</h5>
+                        </div>
+                    </div>
+
+                    <aside class="notes">
+                        Notes de la section
+                    </aside>
+                </section>
+
+            </section>
+
+            <!---------------------------------------------------------------- Section APIGEE ---------------------------------------------------------------->
+            <section>
+
+                <section data-autoappear='{}'>
+                    <h1>APIGEE</h1>
+                </section>
+
+                <!-- Section présentation APIGEE -->
+                <section data-transition="convex" data-autoappear='{}'
+                         style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center;">
+                    <h2>Plateforme de gestion d'API</h2>
+                    <h5>Portail de développeurs permet :</h5>
+                    <ul style="list-style: none; padding: 0; font-size: 0.8em; line-height: 1; text-align: left;">
+                        <li>Accès aux API</li>
+                        <li>Création simplifiée API</li>
+                        <li>Accès documentaires</li>
+                    </ul>
+
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 20px; width: 100%; max-width: 1200px;">
+                        <div style="flex: 1; text-align: center;">
+                            <img src="./photo/apigee_portial_dev.png" alt="Description Image 1" style="width: 100%; max-width: 500px; border-radius: 10px;">
+                        </div>
+                    </div>
+                    <aside class="notes">
+                        C'est une plateforme de gestion d'API permettant de concevoir, déployer, gérer et analyser des API à grande échelle.
+                    </aside>
+                </section>
+
+                <!-- Section Utilisation APIGEE -->
+                <section data-transition="convex" data-autoappear='{}'
+                         style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center;">
+                    <h2>Apigee OPT NC</h2>
+                    <h5>opt-temps-attente-agences-api</h5>
+
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 20px; width: 100%; max-width: 1200px;">
+                        <div style="flex: 1; text-align: center;">
+                            <img src="./photo/apigee_opt_iot.png" alt="Description Image 1" style="width: 100%; max-width: 500px; border-radius: 10px;">
+                        </div>
+                        <div style="flex: 1; text-align: center;">
+                            <img src="./photo/apigee_opt_agences.png" alt="Description Image 2" style="width: 100%; max-width: 500px; border-radius: 10px;">
+                        </div>
+                    </div>
+                    <aside class="notes">
+                        Depuis plus de 2 ans, l’OPT-NC a investi vers une solution de portail d’API industriel, performant et sécurisé.
+                    </aside>
+                </section>
+
+                <!-- Section APIGEE et la matrice-->
+                <section data-transition="convex" data-autoappear='{}'
+                         style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center;">
+                    <h2>API consommées</h2>
+                    <div style="display: flex; justify-content: center; align-items: center; margin-top: 20px; width: 100%;">
+                        <img src="./photo/api_conso.png" alt="Description Image 1"
+                             style="width: 80vw; max-width: 90%; border-radius: 10px;">
+                    </div>
+                    <aside class="notes">
+                        ...
+                    </aside>
+                </section>
+
+
+            </section>
+
+            <!---------------------------------------------------------------- Section devops ---------------------------------------------------------------->
+            <section>
+
+                <section data-autoappear='{}'>
+                    <h1>Script</h1>
+                </section>
+
+                <!-- boot.py  -->
+                <section data-transition="convex">
+                    <h1>boot.py</h1>
+                    <h5>Fichier de boot de la matrice</h5>
+                    <aside class="notes">
+                        Permet au démarrage de la matrice de basculer sur le fichier python de ce projet
+                    </aside>
+                </section>
+
+                <!-- main.py  -->
+                <section data-transition="convex">
+                    <h1>main.py</h1>
+                    <h5>Fichier micropython du projet</h5>
+                    <aside class="notes">
+                        Permet d'executer le script python de ce projet
+                    </aside>
+                </section>
+
+                <!-- information.env  -->
+                <section data-transition="convex">
+                    <h1>information.env</h1>
+                    <h5>Stockage des différents crédential</h5>
+                    <aside class="notes">
+                        Permet de stocker le SSID/clé Wifi et la clé API APIGEE
+                    </aside>
+                </section>
+
+                <!-- Affichage principe script  -->
+                <section data-transition="convex" data-autoappear='{}'>
+                    <h3 style="margin-bottom: 10px;">Principe du script</h3>
+                    <div style="display: flex; justify-content: center; align-items: center; margin-top: 10px; width: 90%;">
+                        <img src="./photo/logigramme1.png" alt="Script_principe"
+                             style="width: 55vw; max-width: 50%; height: auto;">
+                        <div style="text-align: left; width: 35vw;">
+                            <ul style="list-style: none; padding: 0; font-size: 1em; line-height: 1.3; text-align: left;">
+                                <li>Phase de démarrage</li>
+                                <li>Phase affichages</li>
+                                <li>Phase agences</li>
+                                <li>Phase erreurs</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <aside class="notes">
+                        Notes de la section
+                    </aside>
+                </section>
+
+                <!-- Affichage principe phase demarrage  -->
+                <section data-transition="convex" data-autoappear='{}'>
+                    <h3 style="margin-bottom: 10px;">Phase de démarrage</h3>
+                    <div style="display: flex; justify-content: center; align-items: center; margin-top: 10px; width: 90%;">
+                        <img src="./photo/logigramme2.png" alt="Script_principe"
+                             style="width: 55vw; max-width: 50%; height: auto;">
+                        <div style="text-align: left; width: 35vw;">
+                            <ul style="list-style: none; padding: 0; font-size: 1em; line-height: 1.3; text-align: left;">
+                                <li>Chargement .env</li>
+                                <li>Connexion WiFi</li>
+                                <li>Synchronisation NTP</li>
+                                <li>Retour API</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <aside class="notes">
+                        Notes de la section
+                    </aside>
+                </section>
+
+                <!-- Affichage principe phase affichage  -->
+                <section data-transition="convex" data-autoappear='{}'>
+                    <h3 style="margin-bottom: 10px;">Phase d'affichages</h3>
+                    <div style="display: flex; justify-content: center; align-items: center; margin-top: 10px; width: 90%;">
+                        <img src="./photo/logigramme3.png" alt="Script_principe"
+                             style="width: 55vw; max-width: 50%; height: auto;">
+                        <div style="text-align: left; width: 35vw;">
+                            <ul style="list-style: none; padding: 0; font-size: 1em; line-height: 1.3; text-align: left;">
+                                <li>Acceuil</li>
+                                <li>Informations</li>
+                                <li>Légendes</li>
+                                <li>Agences</li>
+                                <li>QR Code</li>
+                            </ul>
+                            <h5>=> Bascule par pression C</h5>
+                        </div>
+                    </div>
+                    <aside class="notes">
+                        Notes de la section
+                    </aside>
+                </section>
+
+                <!-- Affichage principe phase agence  -->
+                <section data-transition="convex" data-autoappear='{}'>
+                    <h3 style="margin-bottom: 10px;">Phase agence</h3>
+                    <div style="display: flex; justify-content: center; align-items: center; margin-top: 10px; width: 90%;">
+                        <img src="./photo/logigramme4.png" alt="Script_principe"
+                             style="width: 55vw; max-width: 50%; height: auto;">
+                        <div style="text-align: left; width: 35vw;">
+                            <ul style="list-style: none; padding: 0; font-size: 1em; line-height: 1.3; text-align: left;">
+                                <li>Affichage agences n</li>
+                                <li>Retour API agence n+1</li>
+                                <li>Bascule sur agence n+1</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <aside class="notes">
+                        Notes de la section
+                    </aside>
+                </section>
+
+                <!-- Affichage principe phase erreur  -->
+                <section data-transition="convex" data-autoappear='{}'>
+                    <h3 style="margin-bottom: 10px;">Contrôle d'erreur</h3>
+                    <div style="display: flex; justify-content: center; align-items: center; margin-top: 10px; width: 90%;">
+                        <img src="./photo/logigramme5.png" alt="Script_principe"
+                             style="width: 55vw; max-width: 50%; height: auto;">
+                        <div style="text-align: left; width: 35vw;">
+                            <ul style="list-style: none; padding: 0; font-size: 1em; line-height: 1.3; text-align: left;">
+                                <li>Affichage "Erreur"</li>
+                                <li>Pression bouton D</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <aside class="notes">
+                        Notes de la section
+                    </aside>
+                </section>
+
+            </section>
+
+            <!---------------------------------------------------------------- Section de présentation des affichages ---------------------------------------------------------------->
+            <section>
+
+                <section data-autoappear='{"h3": {"animation": "animate__fadeInDown", "speed": "fast", "delay": 50, "split": "words", "container-delay": 50}}'>
+                    <h1>Affichages</h1>
+                </section>
+
+                <!-- Affichage Acceuil  -->
+                <section data-transition="convex" data-autoappear='{}'>
+                    <h3>Accueil</h3>
+
+                    <div style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
+                        <div style="position: relative; display: inline-block;">
+                            <img src="./photo/accueil.jpg" alt="Pimoroni accueil" width="500">
+                        </div>
+                    </div>
+                    <aside class="notes">
+                        Notes de la section
+                    </aside>
+                </section>
+
+
+                <!-- Affichage Info  -->
+                <section data-transition="convex" data-autoappear='{}'>
+                    <h3>Information</h3>
+
+                    <div style="display: flex; align-items: center; gap: 20px; margin: 10px 0;">
+                        <div style="flex: 0 0 50%; text-align: center;">
+                            <img src="./photo/info.jpg" alt="Pimoroni legende" style="width: 100%; height: auto; margin: 10px 0; object-fit: contain; border-radius: 10px;">
+                        </div>
+                        <div style="flex: 1; text-align: left;">
+                            <h4 class="animate__fadeInDown" style="margin-bottom: 10px;" data-delay="100">Info accès WiFi</h4>
+                            <h4 class="animate__fadeInDown" style="margin-bottom: 10px;" data-delay="200">Info lecture clé API</h4>
+                        </div>
+                    </div>
+                    <aside class="notes">
+                        Notes de la section
+                    </aside>
+                </section>
+
+                <!-- Affichage légende  -->
+                <section data-transition="convex" data-autoappear='{}'>
+                    <h3>Légendes affichage agence</h3>
+
+                    <div style="display: flex; align-items: center; gap: 20px; margin: 10px 0;">
+                        <div style="flex: 0 0 50%; text-align: center;">
+                            <img src="./photo/legende.jpg" alt="Pimoroni legende" style="width: 100%; height: auto; margin: 10px 0; object-fit: contain; border-radius: 10px;">
+                        </div>
+                        <div style="flex: 1; text-align: left;">
+                            <h4 class="animate__fadeInDown" style="margin-bottom: 10px;" data-delay="100">Icone son activé</h4>
+                            <h4 class="animate__fadeInDown" style="margin-bottom: 10px;" data-delay="200">Icone son désactivé</h4>
+                            <h4 class="animate__fadeInDown" style="margin-bottom: 10px;" data-delay="200">Icone état WIFI</h4>
+                            <h4 class="animate__fadeInDown" style="margin-bottom: 10px;" data-delay="200">Icone arrêt boucle</h4>
+                        </div>
+                    </div>
+                    <aside class="notes">
+                        Notes de la section
+                    </aside>
+                </section>
+
+                <!-- Affichage Agence avec rotation d'images -->
+                <section data-transition="convex" data-autoappear='{}'>
+                    <h3>Agences</h3>
+
+                    <div style="display: flex; align-items: center; gap: 20px; margin: 10px 0;">
+                        <!-- Conteneur de l'image avec ID pour JavaScript -->
+                        <div style="flex: 0 0 50%; text-align: center;">
+                            <img id="image-rotation" src="./photo/mood1.jpg"
+                                 alt="Pimoroni légende"
+                                 style="width: 100%; height: auto; margin: 10px 0; object-fit: contain; border-radius: 10px;">
+                        </div>
+
+                        <!-- Liste des informations -->
+                        <div style="flex: 1; text-align: left;">
+                            <h4 class="animate__fadeInDown" style="margin-bottom: 2px;" data-delay="100">Sigle OPT</h4>
+                            <h4 class="animate__fadeInDown" style="margin-bottom: 2px;" data-delay="100">Heure NTP</h4>
+                            <h4 class="animate__fadeInDown" style="margin-bottom: 2px;" data-delay="100">Smiley temps attente</h4>
+                            <h4 class="animate__fadeInDown" style="margin-bottom: 2px;" data-delay="100">Icone Son</h4>
+                            <h4 class="animate__fadeInDown" style="margin-bottom: 2px;" data-delay="100">Information Temps</h4>
+                            <h4 class="animate__fadeInDown" style="margin-bottom: 2px;" data-delay="100">Icone Wifi</h4>
+                            <h4 class="animate__fadeInDown" style="margin-bottom: 2px;" data-delay="100">Icone boucle</h4>
+                            <h4 class="animate__fadeInDown" style="margin-bottom: 2px;" data-delay="100">Défilement agence</h4>
+                        </div>
+                    </div>
+
+                    <aside class="notes">
+                        Notes de la section
+                    </aside>
+                </section>
+
+                <!-- Affichage QR Code  -->
+                <section data-transition="convex" data-autoappear='{}'>
+                    <h3>QR Code</h3>
+
+                    <div style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
+                        <div style="position: relative; display: inline-block;">
+                            <img src="./photo/qr_code.jpg" alt="Pimoroni qr-code" width="500">
+                        </div>
+                    </div>
+                    <aside class="notes">
+                        Notes de la section
+                    </aside>
+                </section>
+
+                <!-- Affichage programmation des boutons  -->
+                <section data-transition="convex" data-autoappear='{}'>
+                    <h3>Boutons programmables</h3>
+
+                    <div style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
+                        <div style="position: relative; display: inline-block;">
+                            <img src="./photo/Pimoroni_back.png" alt="Pimoroni boutons" width="500">
+                        </div>
+                    </div>
+                    <h6 class="animate__fadeInDown small-underline-text" style="position: absolute; top: 58%; left: 75%; transform: translateX(-50%);" data-delay="300">A: Son</h6>
+                    <h6 class="animate__fadeInDown small-underline-text" style="position: absolute; top: 64%; left: 75%; transform: translateX(-50%);" data-delay="300">B: Boucle</h6>
+                    <h6 class="animate__fadeInDown small-underline-text" style="position: absolute; top: 70%; left: 75%; transform: translateX(-50%);" data-delay="300">C: Screen</h6>
+                    <h6 class="animate__fadeInDown small-underline-text" style="position: absolute; top: 76%; left: 75%; transform: translateX(-50%);" data-delay="300">D: Reboot</h6>
+                    <h6 class="animate__fadeInDown small-underline-text" style="position: absolute; top: 68%; left: 10%; transform: translateX(-50%);" data-delay="300">Volume +/-</h6>
+                    <h6 class="animate__fadeInDown small-underline-text" style="position: absolute; top: 80%; left: 10%; transform: translateX(-50%);" data-delay="300">Lux +/-</h6>
+                    <aside class="notes">
+                        Notes de la section
+                    </aside>
+                </section>
+
+            </section>
+
+            <!---------------------------------------------------------------- Section retour sur projet ---------------------------------------------------------------->
+
+            <section>
+
+                <section data-autoappear='{}'>
+                    <h1>Que retenir ?</h1>
+                </section>
+
+                <!-- Section Points sensibles -->
+                <section data-autoappear='{"h3": {"animation": "animate__fadeInDown", "speed": "fast", "delay": 50, "split": "words", "container-delay": 50}}'>
+                    <h1>Points sensibles</h1>
+                    <h3>Univers DevOps</h3>
+                    <h3>Langage MicroPython</h3>
+                    <h3>Utilisation de GitHub</h3>
+                    <aside class="notes">
+                        Notes de la section.
+                    </aside>
+                </section>
+
+                <!-- Section Gains possibles -->
+                <section data-autoappear='{"h3": {"animation": "animate__fadeInDown", "speed": "fast", "delay": 50, "split": "words", "container-delay": 50}}'>
+                    <h1>Gains possibles</h1>
+                    <h3>Solution modulable</h3>
+                    <h3>Optimisation script</h3>
+                    <h3>Ajout de matrices</h3>
+                    <aside class="notes">
+                        Notes de la section.
+                    </aside>
+                </section>
+
+            </section>
+
+            <!---------------------------------------------------------------- Section fin ---------------------------------------------------------------->
+
+            <section>
+
+                <section data-autoappear='{}'>
+                    <h1>Sources</h1>
+                </section>
+
+                <!-- Sources -->
+                <section data-transition="convex" data-autoappear='{}'
+                         style="display: flex; flex-direction: column; gap: 40px; align-items: flex-start; padding: 50px; width: 100vw; height: 100vh; justify-content: center;">
+                    <div style="display: flex; align-items: center; gap: 40px; width: 65%; max-width: 1000px; margin-bottom: 20px;">
+                        <img src="./photo/logo_pimo.png" alt="Logo Pimoroni" style="width: 150px; height: auto;">
+                        <div style="text-align: left;">
+                            <h2 style="margin: 0;">Sources matrice</h2>
+                            <h6 style="margin: 5px 0;">GitHub Pimoroni Ltd</h6>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 40px; width: 65%; max-width: 1000px; margin-bottom: 20px;">
+                        <img src="./photo/logo_thonny.png" alt="Logo Thonny" style="width: 150px; height: auto;">
+                        <div style="text-align: left;">
+                            <h2 style="margin: 0;">Gestion Data matrice</h2>
+                            <h6 style="margin: 5px 0;">Logiciel Thonny</h6>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 40px; width: 65%; max-width: 1000px;">
+                        <img src="./photo/logo_github.png" alt="Logo GitHub" style="width: 150px; height: auto;">
+                        <div style="text-align: left;">
+                            <h2 style="margin: 0;">Support projet</h2>
+                            <h6 style="margin: 5px 0;">
+                                <a href="https://github.com/adriens/temps-attente-matrix-led" style="color: inherit; text-decoration: none;">
+                                    https://github.com/adriens/temps-attente-matrix-led
+                                </a>
+                            </h6>
+                        </div>
+                    </div>
+                    <aside class="notes">
+                        Notes de la section
+                    </aside>
+                </section>
+
+                <!-- Hackster  -->
+                <section data-transition="convex" data-autoappear='{}'>
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 10px; text-align: center;">
+                        <h3 style="margin: 0;">Hackster.io -   </h3>
+                        <h3 style="margin: 0;">https://bit.ly/3YZZRkJ</h3>
+                    </div>
+                    <div style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
+                        <div style="position: relative; display: inline-block;">
+                            <img src="./photo/qrcode_hackster_with_logo.png" alt="hackster" width="500">
+                        </div>
+                    </div>
+                    <aside class="notes">
+                        Notes de la section
+                    </aside>
+                </section>
+
+            </section>
+        </div>
+    </div>
+
+    <!---------------------------------------------------------------- Partie script ---------------------------------------------------------------->
+    <!-- Initialize -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.4.0/dist/reveal.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.4.0/plugin/notes/notes.js"></script>
+    <script src="plugin/appearance/appearance.js"></script>
+    <script src="socket.io/socket.io.js"></script>
+    <script src="node_modules/reveal-notes-server/client.js"></script>
+
+    <script>
+        const socket = io('http://192.168.1.116:1947');
+        socket.on('connect', () => {
+            console.log('Connected to reveal-notes-server');
+        });
+        socket.on('disconnect', () => {
+            console.log('Disconnected from reveal-notes-server');
+        });
+    </script>
+
+    <script>
+        Reveal.initialize({
+            controls: true,
+            progress: true,
+            history: true,
+            center: true,
+            showNotes: true,
+            transition: 'slide',
+            transitionSpeed: 'fast',
+            plugins: [RevealMarkdown, RevealHighlight, RevealNotes, Appearance],
+            multiplex: {
+                secret: null, // Indispensable pour le contrôle à distance
+                id: 'UNIQUE_SESSION_ID',
+                url: 'http://192.168.1.116:3000'
+            },
+            dependencies: [
+                { src: 'https://cdn.jsdelivr.net/npm/reveal.js-multiplex/client.js', async: true }
+            ]
+        });
+    </script>
+
+    <!-- appearance.js -->
+    <script src="plugin/appearance/appearance.js"></script>
+    <script>
+        Reveal.initialize({
+            slideNumber: true,
+            transition: 'slide', // Types : 'fade', 'slide', 'convex', 'concave', 'zoom'
+            transitionSpeed: 'fast', // Vitesse de transition : 'default', 'fast', 'slow'
+            // Configuration pour Appearance
+            plugins: [Appearance],
+            appearance: {
+                autoappear: false,  // Ne pas animer tous les éléments par défaut
+                autoelements: '{"ul li": "animate__fadeInLeft"}'
+            }
+        });
+    </script>
+
+    <!-- Activation du contrôle distant natif -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.4.0/plugin/remote/remote.js"></script>
+    <script>
+        Reveal.initialize({
+            plugins: [RevealNotes, RevealRemote]
+        });
+    </script>
+
+    <!-- Barre temporelle haute -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const duration = 15 * 60; // Durée de 15 minutes en secondes (15 min)
+            const timeProgressBar = document.createElement('div');
+            const timeInnerBar = document.createElement('div');
+            let timerStarted = false; // Empêche plusieurs démarrages
+            let interval; // Stocke le timer pour le stopper si besoin
+
+            // Vérifie si on est dans la fenêtre des notes
+            const isNotesWindow = window.location.pathname.includes("notes");
+
+            // Style de la barre externe
+            timeProgressBar.id = 'time-progress-bar';
+            timeInnerBar.style.width = '0';
+            timeProgressBar.appendChild(timeInnerBar);
+            document.body.appendChild(timeProgressBar);
+
+            // Fonction pour démarrer le chrono et la barre temporelle
+            const startTimer = () => {
+                if (timerStarted) return; // Empêche plusieurs démarrages
+                timerStarted = true;
+                let elapsed = 0;
+
+                interval = setInterval(() => {
+                    elapsed += 1;
+                    const percentage = (elapsed / duration) * 100;
+                    timeInnerBar.style.width = percentage + '%';
+
+                    if (elapsed >= duration) {
+                        clearInterval(interval);
+                        alert('Temps écoulé ! Fin de la présentation.');
+                    }
+                }, 1000);
+            };
+
+            // Cacher la barre de progression Reveal.js au début
+            const progressBar = document.querySelector('.progress');
+            if (progressBar) {
+                progressBar.style.display = 'none';
+            }
+
+            // Événement déclenché au changement de slide
+            Reveal.on('slidechanged', (event) => {
+                // Affiche la barre de progression à partir de la 2ᵉ slide
+                if (progressBar) {
+                    progressBar.style.display = event.indexh >= 1 ? 'block' : 'none';
+                }
+
+                // Démarrer le chrono et la barre temporelle seulement à partir de la 2ᵉ slide
+                if (event.indexh === 1 && !timerStarted) {
+                    startTimer();
+                }
+            });
+
+            //  Si la fenêtre Notes est ouverte, elle doit attendre la slide 2 pour démarrer le chrono aussi
+            if (isNotesWindow) {
+                Reveal.on('slidechanged', (event) => {
+                    if (event.indexh === 1 && !timerStarted) {
+                        startTimer();
+                    }
+                });
+            }
+        });
+    </script>
+
+    <!-- Script pour faire défiler les images -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const images = ["./photo/mood1.jpg", "./photo/mood2.jpg", "./photo/mood3.jpg"];
+            let index = 0;
+            const imageElement = document.getElementById("image-rotation");
+
+            function changeImage() {
+                index = (index + 1) % images.length;
+                imageElement.src = images[index];
+            }
+
+            // Change d'image toutes les 3 secondes
+            setInterval(changeImage, 3000);
+        });
+    </script>
+
+</body>
+</html>

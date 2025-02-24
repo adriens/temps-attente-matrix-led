@@ -1,0 +1,38 @@
+⚡ Lancer la Présentation Reveal.js avec les Notes sur le Réseau Local
+
+📌 Étape 1 : Autoriser l’exécution des scripts PowerShell
+⚠️ À exécuter une seule fois dans un PowerShell en mode Administrateur :
+powershell
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+- Les scripts locaux (.ps1) peuvent s’exécuter sans restriction.
+- Les scripts téléchargés depuis le Web doivent être signés pour être exécutés.
+
+📌 Étape 2 : Aller dans le dossier du projet
+Dans PowerShell :
+cd "C:\Users\raph\Documents\Master\Projet\Sujet2-MatriceLED\memoire"
+
+📌 Étape 3 : Relever l’IP du PC
+Exécuter dans PowerShell :
+ipconfig | findstr /i "IPv4"
+- Note l’IP locale du PC, par exemple 192.168.1.116.
+
+📌 Étape 4 : Lancer le serveur Reveal.js
+Exécuter :
+npx reveal-notes-server --hostname=192.168.1.116 --presentationDir=./ --presentationIndex=/index.html
+- Remplace 192.168.1.116 par l'IP relevée !
+
+📌 Étape 5 : Ouvrir les liens
+Sur le PC :
+🌐 Présentation 👉 http://192.168.1.116:1947
+=> l'accès à l'url lance  automatiquement Notes 👉 http://192.168.1.116:1947/notes
+
+Sur un téléphone/tablette :
+📱 Télécommande 👉 http://192.168.1.116:1947
+=> l'accès à l'url lance  automatiquement Notes 👉 http://192.168.1.116:1947/notes
+
+si problème d'accès aux notes verifier si un process n'écoute pas le 1947 : 
+netstat -nao | findstr :1947
+taskkill /PID numéro_pid /F
+npx reveal-notes-server....
+=> et c'est reparti
+

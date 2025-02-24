@@ -105,5 +105,11 @@
       "no-eq-null": 2,
       "no-unused-expressions": 0
     }
+  },
+  "dependencies": {
+    "pdfkit": "^0.16.0",
+    "puppeteer": "^24.2.1",
+    "reveal-multiplex": "^0.1.0",
+    "reveal-notes-server": "^0.2.1"
   }
 }
