@@ -80,29 +80,48 @@ Use Thonny IDE to overwrite the old script on the Pico's filesystem.
 * **Brightness +/- Buttons**: Adjust the brightness of the LED matrix.
 
 # 11. Troubleshooting
+
 # 11.1 Debugging and Connecting with Thonny
 If your Cosmic Unicorn starts automatically and launches the script, it may block access to the REPL and prevent Thonny from taking control. 
 To properly connect Thonny and upload or modify your code, follow these steps:
-**Manual Reset of the Board**
-* Press the reset button (or perform a hard reset) on your Raspberry Pi Pico W.
-* This will interrupt the running script.
-**Connecting via Thonny**
-* Once the board has restarted, open Thonny and select the interpreter corresponding to your Raspberry Pi Pico W.
-* Thonny should then be able to connect to the REPL, allowing you to upload and manage your code.
+1. **Manual Reset of the Board**
+   - Press the reset button (or perform a hard reset) on your Raspberry Pi Pico W.
+   - This will interrupt the running script.
+2. **Connecting via Thonny**
+   - Once the board has restarted, open Thonny and select the interpreter corresponding to your Raspberry Pi Pico W.
+   - Thonny should then be able to connect to the REPL, allowing you to upload and manage your code.
 This procedure ensures that the board is not blocked by the automatic script execution, and you can interact with it via Thonny for any debugging or updating operations.
 
 # 11.2 Hard Reset and/or Upgrade Firmware
 To perform a hard reset—preventing the script from automatically running and allowing you to upload your files via Thonny—follow these steps:
-**Hard Reset in BOOTSEL Mode**
-* Disconnect the board.
-* Hold down the BOOTSEL button (located near the USB port) while reconnecting the Raspberry Pi Pico W to your computer.
-* Release the BOOTSEL button once the board is connected.
-* The board will then appear as a USB storage device. In this mode, the script will not run automatically, allowing you to access the REPL.
-**Connecting via Thonny**
-* Open Thonny and select the MicroPython (Raspberry Pi Pico) interpreter.
-* Select the firmware for Raspberry Pi Pico W with RP2040.
-* Execute the task to download and upload this firmware.
-* Once completed, you will be able to access the board via the REPL through Thonny.
+1. **Hard Reset in BOOTSEL Mode**
+   - Disconnect the board.
+   - Hold down the BOOTSEL button (located near the USB port) while reconnecting the Raspberry Pi Pico W to your computer.
+   - Release the BOOTSEL button once the board is connected.
+   - The board will then appear as a USB storage device. In this mode, the script will not run automatically, allowing you to access the REPL.
+2. **Connecting via Thonny**
+   - Open Thonny and select the MicroPython (Raspberry Pi Pico) interpreter.
+   - Select the firmware for Raspberry Pi Pico W with RP2040.
+   - Execute the task to download and upload this firmware.
+Once completed, you will be able to access the board via the REPL through Thonny.
+
+## 11.3 Flashing the Matrix
+To completely flash the firmware on your Cosmic Unicorn board, follow these steps:
+1. **Enter BOOTSEL Mode:**  
+   - Disconnect your Raspberry Pi Pico W from your computer.  
+   - Hold down the **BOOTSEL** button (located near the USB port) while reconnecting the board to your computer.  
+   - Release the **BOOTSEL** button once the board is connected.  
+   - The board will appear as a USB mass storage device.
+2. **Flash the Firmware:**  
+   - Open Windows Explorer and navigate to the newly appeared USB drive.  
+   - Copy the file **`cosmic_unicorn_flash_nuke.uf2`** to the drive. This file will completely reset the board and erase the current firmware.  
+   - Once the reset is complete, copy the file **`cosmic_unicorn-v1.23.0-1-pimoroni-micropython.uf2`** to the same drive to flash the new firmware.
+3. **Reconnect and Access via Thonny:**  
+   - Safely eject the USB drive and disconnect the board.  
+   - Reconnect the board normally (without holding BOOTSEL).  
+   - Open Thonny and select the MicroPython (Raspberry Pi Pico) interpreter.  
+   - You should now be able to access the board’s REPL and manage your files as needed.
+This procedure ensures a complete firmware flash, allowing you to regain full control over the board via Thonny.
 
 # Additional Notes
 Feedback and Contributions: If you'd like to contribute or provide feedback on this guide, please open an issue or submit a pull request on GitHub.
