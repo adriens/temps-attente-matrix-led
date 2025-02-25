@@ -101,7 +101,7 @@ To perform a hard reset—preventing the script from automatically running and a
    - The board will then appear as a USB storage device. In this mode, the script will not run automatically, allowing you to access the REPL.
 2. **Connecting via Thonny**
    - Open Thonny and select the MicroPython (Raspberry Pi Pico) interpreter.
-   - Select the firmware for Raspberry Pi Pico W with RP2040.
+   - Select the firmware for Pimoroni-CosmicUnicorn.
    - Execute the task to download and upload this firmware.
 Once completed, you will be able to access the board via the REPL through Thonny.
 
