@@ -81,7 +81,7 @@ Use Thonny IDE to overwrite the old script on the Pico's filesystem.
 
 # 11. Troubleshooting
 
-# 11.1 Debugging and Connecting with Thonny
+## 11.1 Debugging and Connecting with Thonny
 If your Cosmic Unicorn starts automatically and launches the script, it may block access to the REPL and prevent Thonny from taking control. 
 To properly connect Thonny and upload or modify your code, follow these steps:
 1. **Manual Reset of the Board**
@@ -92,7 +92,7 @@ To properly connect Thonny and upload or modify your code, follow these steps:
    - Thonny should then be able to connect to the REPL, allowing you to upload and manage your code.
 This procedure ensures that the board is not blocked by the automatic script execution, and you can interact with it via Thonny for any debugging or updating operations.
 
-# 11.2 Hard Reset and/or Upgrade Firmware
+## 11.2 Hard Reset and/or Upgrade Firmware
 To perform a hard reset—preventing the script from automatically running and allowing you to upload your files via Thonny—follow these steps:
 1. **Hard Reset in BOOTSEL Mode**
    - Disconnect the board.
